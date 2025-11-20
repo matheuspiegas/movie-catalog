@@ -14,6 +14,12 @@ export default defineConfig([
       tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
+      {
+        "rules": {
+          "no-unused-vars": "off",
+          "@typescript-eslint/no-unused-vars": "off"
+        }
+      }
     ],
     languageOptions: {
       ecmaVersion: 2020,
