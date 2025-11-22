@@ -13,6 +13,7 @@ import { Button } from "./ui/button"
 import { Search, X } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useQueryState } from "nuqs"
+import { useEffect } from "react"
 
 const searchSchema = z.object({
   query: z.string().optional(),
@@ -20,7 +21,7 @@ const searchSchema = z.object({
 
 export function GlobalSearchInput() {
   const navigate = useNavigate()
-  const [query] = useQueryState("query")
+  const [query, setQuery] = useQueryState("query")
 
   const form = useForm({
     resolver: zodResolver(searchSchema),
@@ -29,11 +30,24 @@ export function GlobalSearchInput() {
     },
   })
 
+  // Sincronizar o formulário quando a query mudar
+  useEffect(() => {
+    form.reset({ query: query || "" })
+  }, [query, form])
+
   function onSubmit(data: z.infer<typeof searchSchema>) {
     if (!data.query || data.query.trim() === "") {
       return
     }
-    navigate(`/search?query=${encodeURIComponent(data.query.trim())}`)
+    const searchQuery = data.query.trim()
+
+    // Se já estiver na página de busca, apenas atualiza a query
+    if (window.location.pathname === "/search") {
+      setQuery(searchQuery)
+    } else {
+      // Se não, navega para a página de busca
+      navigate(`/search?query=${encodeURIComponent(searchQuery)}`)
+    }
   }
 
   function handleClear() {
