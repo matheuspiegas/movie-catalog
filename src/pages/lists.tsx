@@ -45,7 +45,7 @@ export function ListsPage() {
                 Para criar listas você deve criar ou entrar em uma conta.
               </p>
             </div>
-            <SignInButton mode="modal">
+            <SignInButton mode="redirect">
               <Button size="lg">
                 <LogIn className="mr-2 h-5 w-5" />
                 Fazer Login
