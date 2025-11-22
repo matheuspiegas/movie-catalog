@@ -63,11 +63,11 @@ export function Navbar() {
                 Séries
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link to="/search/movie" className="hover:underline">
                 Buscar
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link to="/lists" className="hover:underline">
                 Minhas listas
@@ -138,7 +138,7 @@ export function Navbar() {
                   Séries
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/search/movie"
                   className="block hover:underline"
@@ -146,7 +146,7 @@ export function Navbar() {
                 >
                   Buscar
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   to="/lists"

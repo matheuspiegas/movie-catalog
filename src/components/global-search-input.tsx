@@ -10,12 +10,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "./ui/button"
-import { Search } from "lucide-react"
+import { Search, X } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useQueryState } from "nuqs"
 
 const searchSchema = z.object({
-  query: z.string().min(1, "Digite algo para buscar"),
+  query: z.string().optional(),
 })
 
 export function GlobalSearchInput() {
@@ -30,9 +30,15 @@ export function GlobalSearchInput() {
   })
 
   function onSubmit(data: z.infer<typeof searchSchema>) {
-    if (data.query.trim()) {
-      navigate(`/search?query=${encodeURIComponent(data.query.trim())}`)
+    if (!data.query || data.query.trim() === "") {
+      return
     }
+    navigate(`/search?query=${encodeURIComponent(data.query.trim())}`)
+  }
+
+  function handleClear() {
+    form.reset({ query: "" })
+    navigate("/")
   }
 
   return (
@@ -58,6 +64,17 @@ export function GlobalSearchInput() {
           <Button type="submit" size="icon" className="h-12 w-12">
             <Search className="h-5 w-5" />
           </Button>
+          {query && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={handleClear}
+              className="h-12 w-12"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          )}
         </form>
       </Form>
     </div>
