@@ -104,6 +104,82 @@ export interface MoviesResponse {
   total_results: number
 }
 
+// Interfaces para Séries de TV
+export interface TVShow {
+  id: number
+  name: string
+  original_name: string
+  overview: string
+  poster_path: string | null
+  backdrop_path: string | null
+  first_air_date: string
+  vote_average: number
+  vote_count: number
+  popularity: number
+  genre_ids: number[]
+  origin_country: string[]
+  original_language: string
+}
+
+export interface TVShowDetails {
+  id: number
+  name: string
+  original_name: string
+  tagline: string
+  overview: string
+  poster_path: string | null
+  backdrop_path: string | null
+  first_air_date: string
+  last_air_date: string
+  vote_average: number
+  vote_count: number
+  genres: Genre[]
+  production_companies: ProductionCompany[]
+  number_of_seasons: number
+  number_of_episodes: number
+  episode_run_time: number[]
+  status: string
+  original_language: string
+  popularity: number
+  in_production: boolean
+}
+
+export interface TVShowsResponse {
+  page: number
+  results: TVShow[]
+  total_pages: number
+  total_results: number
+}
+
+// Interface para conteúdo misto (trending all)
+export interface MediaItem {
+  id: number
+  media_type: "movie" | "tv"
+  title?: string // para filmes
+  name?: string // para séries
+  original_title?: string
+  original_name?: string
+  overview: string
+  poster_path: string | null
+  backdrop_path: string | null
+  release_date?: string // para filmes
+  first_air_date?: string // para séries
+  vote_average: number
+  vote_count: number
+  popularity: number
+  genre_ids: number[]
+  adult?: boolean
+  video?: boolean
+  original_language: string
+}
+
+export interface MediaResponse {
+  page: number
+  results: MediaItem[]
+  total_pages: number
+  total_results: number
+}
+
 // Buscar filmes populares ou fazer busca
 export async function getPopularMovies(
   page: number = 1,
@@ -182,6 +258,27 @@ export function getImageUrl(
   return `${IMAGE_BASE_URL}/${size}${path}`
 }
 
+// ========== Trending All (Filmes e Séries) ==========
+
+// Buscar conteúdo em alta (trending) - filmes e séries misturados
+export async function getTrendingAll(
+  timeWindow: "day" | "week" = "day",
+  page: number = 1
+): Promise<MediaResponse> {
+  const response = await fetch(
+    `${BASE_URL}/trending/all/${timeWindow}?language=pt-BR&page=${page}`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar conteúdo em alta")
+  }
+
+  return response.json()
+}
+
+// ========== Filmes ==========
+
 // Buscar detalhes de um filme
 export async function getMovieDetails(movieId: number): Promise<MovieDetails> {
   const response = await fetch(`${BASE_URL}/movie/${movieId}?language=pt-BR`, {
@@ -254,6 +351,120 @@ export async function getPersonMovieCredits(
 
   if (!response.ok) {
     throw new Error("Erro ao buscar filmografia")
+  }
+
+  return response.json()
+}
+
+// ========== Séries de TV ==========
+
+// Buscar séries populares ou fazer busca
+export async function getPopularTVShows(
+  page: number = 1,
+  search?: string | null
+): Promise<TVShowsResponse> {
+  // Se há um termo de busca, usa o endpoint de search
+  if (search && search.trim().length > 0) {
+    const response = await fetch(
+      `${BASE_URL}/search/tv?language=pt-BR&query=${encodeURIComponent(
+        search
+      )}&page=${page}`,
+      { headers }
+    )
+
+    if (!response.ok) {
+      throw new Error("Erro ao buscar séries")
+    }
+
+    return response.json()
+  }
+
+  // Caso contrário, retorna séries populares
+  const response = await fetch(
+    `${BASE_URL}/tv/popular?language=pt-BR&page=${page}`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar séries populares")
+  }
+
+  return response.json()
+}
+
+// Buscar séries em alta (trending)
+export async function getTrendingTVShows(
+  timeWindow: "day" | "week" = "day"
+): Promise<TVShowsResponse> {
+  const response = await fetch(
+    `${BASE_URL}/trending/tv/${timeWindow}?language=pt-BR`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar séries em alta")
+  }
+
+  return response.json()
+}
+
+// Buscar séries por termo de busca
+export async function searchTVShows(
+  query: string,
+  page: number = 1
+): Promise<TVShowsResponse> {
+  const response = await fetch(
+    `${BASE_URL}/search/tv?language=pt-BR&query=${encodeURIComponent(
+      query
+    )}&page=${page}`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar séries")
+  }
+
+  return response.json()
+}
+
+// Buscar detalhes de uma série
+export async function getTVShowDetails(tvId: number): Promise<TVShowDetails> {
+  const response = await fetch(`${BASE_URL}/tv/${tvId}?language=pt-BR`, {
+    headers,
+  })
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar detalhes da série")
+  }
+
+  return response.json()
+}
+
+// Buscar elenco de uma série
+export async function getTVShowCredits(tvId: number): Promise<CreditsResponse> {
+  const response = await fetch(
+    `${BASE_URL}/tv/${tvId}/credits?language=pt-BR`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar elenco da série")
+  }
+
+  return response.json()
+}
+
+// Buscar recomendações de séries
+export async function getTVShowRecommendations(
+  tvId: number
+): Promise<TVShowsResponse> {
+  const response = await fetch(
+    `${BASE_URL}/tv/${tvId}/recommendations?language=pt-BR`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar recomendações")
   }
 
   return response.json()

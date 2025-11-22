@@ -8,7 +8,6 @@ import {
 // Query key factory
 export const listsKeys = {
   all: ["lists"] as const,
-  detail: (id: string) => ["lists", id] as const,
 }
 
 // Hook para buscar todas as listas
@@ -16,15 +15,6 @@ export function useLists() {
   return useQuery({
     queryKey: listsKeys.all,
     queryFn: () => listsService.getLists(),
-  })
-}
-
-// Hook para buscar uma lista específica
-export function useList(id: string) {
-  return useQuery({
-    queryKey: listsKeys.detail(id),
-    queryFn: () => listsService.getListById(id),
-    enabled: !!id,
   })
 }
 
@@ -48,10 +38,9 @@ export function useUpdateList() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: UpdateListInput }) =>
       listsService.updateList(id, input),
-    onSuccess: (data) => {
-      // Invalida tanto a lista geral quanto o detalhe da lista
+    onSuccess: () => {
+      // Invalida a lista geral
       queryClient.invalidateQueries({ queryKey: listsKeys.all })
-      queryClient.invalidateQueries({ queryKey: listsKeys.detail(data.id) })
     },
   })
 }

@@ -1,11 +1,11 @@
-import { useInfiniteTrendingAll } from "@/hooks/useMovies"
+import { useInfinitePopularMovies } from "@/hooks/useMovies"
 import { MovieCard } from "@/components/movie-card"
 import { useEffect, useRef, useState } from "react"
+import { SearchMovieInput } from "@/components/search-movie-input"
 import { ArrowUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { GlobalSearchInput } from "@/components/global-search-input"
 
-export function HomePage() {
+export function MoviesPage() {
   const observerTarget = useRef<HTMLDivElement>(null)
   const [showScrollTop, setShowScrollTop] = useState(false)
 
@@ -17,7 +17,7 @@ export function HomePage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteTrendingAll("week")
+  } = useInfinitePopularMovies()
 
   // Intersection Observer para detectar quando o usuário chega ao fim da página
   useEffect(() => {
@@ -61,7 +61,7 @@ export function HomePage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-lg text-muted-foreground">Carregando conteúdo...</p>
+        <p className="text-lg text-muted-foreground">Carregando filmes...</p>
       </div>
     )
   }
@@ -71,7 +71,7 @@ export function HomePage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <p className="text-lg text-destructive mb-2">
-            Erro ao carregar conteúdo
+            Erro ao carregar filmes
           </p>
           <p className="text-sm text-muted-foreground">{error?.message}</p>
         </div>
@@ -79,43 +79,34 @@ export function HomePage() {
     )
   }
 
-  // Combina todos os itens de todas as páginas carregadas
-  const mediaItems = data?.pages.flatMap((page) => page.results) || []
+  // Combina todos os filmes de todas as páginas carregadas
+  const movies = data?.pages.flatMap((page) => page.results) || []
 
-  // Remove duplicatas baseado no ID
-  const uniqueMediaItems = mediaItems.reduce((acc, item) => {
-    if (!acc.find((m) => m.id === item.id)) {
-      acc.push(item)
+  // Remove duplicatas baseado no ID do filme
+  const uniqueMovies = movies.reduce((acc, movie) => {
+    if (!acc.find((m) => m.id === movie.id)) {
+      acc.push(movie)
     }
     return acc
-  }, [] as typeof mediaItems)
+  }, [] as typeof movies)
 
   return (
     <div className="relative container py-8">
       <div>
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          Descubra Filmes e Séries
-        </h1>
-
-        <div className="mb-12">
-          <GlobalSearchInput />
-        </div>
-
-        <h2 className="text-2xl font-bold mb-6">Em Alta Esta Semana</h2>
+        <SearchMovieInput
+          placeholder="Buscar filmes..."
+          title="Filmes Populares"
+        />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
-          {uniqueMediaItems.map((item) => (
+          {uniqueMovies.map((movie) => (
             <MovieCard
-              key={`${item.media_type}-${item.id}`}
-              id={item.id}
-              title={item.media_type === "movie" ? item.title! : item.name!}
-              poster_path={item.poster_path}
-              vote_average={item.vote_average}
-              release_date={
-                item.media_type === "movie"
-                  ? item.release_date
-                  : item.first_air_date
-              }
-              mediaType={item.media_type}
+              key={movie.id}
+              id={movie.id}
+              title={movie.title}
+              poster_path={movie.poster_path}
+              vote_average={movie.vote_average}
+              release_date={movie.release_date}
+              mediaType="movie"
             />
           ))}
         </div>
@@ -126,10 +117,10 @@ export function HomePage() {
           className="h-20 flex items-center justify-center mt-8"
         >
           {isFetchingNextPage && (
-            <p className="text-muted-foreground">Carregando mais conteúdo...</p>
+            <p className="text-muted-foreground">Carregando mais filmes...</p>
           )}
-          {!hasNextPage && uniqueMediaItems.length > 0 && (
-            <p className="text-muted-foreground">Você viu todo o conteúdo!</p>
+          {!hasNextPage && uniqueMovies.length > 0 && (
+            <p className="text-muted-foreground">Você viu todos os filmes!</p>
           )}
         </div>
       </div>

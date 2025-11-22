@@ -1,28 +1,18 @@
-import { useLists, useDeleteList } from "@/hooks/useLists"
+import { useLists } from "@/hooks/useLists"
 import { ListCard } from "@/components/list-card"
 import { EmptyListsState } from "@/components/empty-lists-state"
 import { CreateListDialog } from "@/components/create-list-dialog"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ListPlus } from "lucide-react"
-import type { List } from "@/services/lists"
+import { ListPlus, LogIn } from "lucide-react"
+import { useUser, SignInButton } from "@clerk/clerk-react"
 
 export function ListsPage() {
+  const { user, isLoaded } = useUser()
   const { data: lists, isLoading, isError, error } = useLists()
-  const { mutate: deleteList } = useDeleteList()
 
-  const handleDelete = (id: string) => {
-    if (confirm("Tem certeza que deseja excluir esta lista?")) {
-      deleteList(id)
-    }
-  }
-
-  const handleEdit = (list: List) => {
-    // TODO: Implementar dialog de edição
-    console.log("Editar lista:", list)
-  }
-
-  if (isLoading) {
+  // Aguardar carregamento do Clerk
+  if (!isLoaded || isLoading) {
     return (
       <div className="container py-8">
         <div className="mb-6">
@@ -33,6 +23,35 @@ export function ListsPage() {
           {[...Array(8)].map((_, i) => (
             <Skeleton key={i} className="h-[150px] rounded-lg" />
           ))}
+        </div>
+      </div>
+    )
+  }
+
+  // Usuário não autenticado
+  if (!user) {
+    return (
+      <div className="container py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center max-w-md">
+            <div className="mb-6">
+              <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <ListPlus className="h-8 w-8 text-primary" />
+              </div>
+              <h2 className="text-2xl font-bold mb-2">
+                Crie suas listas personalizadas
+              </h2>
+              <p className="text-muted-foreground">
+                Para criar listas você deve criar ou entrar em uma conta.
+              </p>
+            </div>
+            <SignInButton mode="modal">
+              <Button size="lg">
+                <LogIn className="mr-2 h-5 w-5" />
+                Fazer Login
+              </Button>
+            </SignInButton>
+          </div>
         </div>
       </div>
     )
@@ -76,12 +95,7 @@ export function ListsPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {lists.map((list) => (
-              <ListCard
-                key={list.id}
-                list={list}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-              />
+              <ListCard key={list.id} list={list} />
             ))}
           </div>
         </>

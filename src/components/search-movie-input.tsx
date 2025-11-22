@@ -11,12 +11,21 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "./ui/button"
 import { useQueryState } from "nuqs"
+import { Search, X } from "lucide-react"
 
 const searchSchema = z.object({
   query: z.string().optional(),
 })
 
-export function SearchMovieInput() {
+interface SearchMovieInputProps {
+  placeholder?: string
+  title?: string
+}
+
+export function SearchMovieInput({
+  placeholder = "Buscar filmes...",
+  title = "Filmes Populares",
+}: SearchMovieInputProps) {
   const [search, setSearch] = useQueryState("search")
 
   const form = useForm({
@@ -40,32 +49,46 @@ export function SearchMovieInput() {
   }
 
   return (
-    <div className="mb-8">
-      <h1 className="text-3xl font-bold mb-4">
-        {search ? `Resultados para "${search}"` : "Filmes Populares"}
+    <div className="mb-12">
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        {search ? `Resultados para "${search}"` : title}
       </h1>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-2">
-          <FormField
-            control={form.control}
-            name="query"
-            render={({ field }) => (
-              <FormItem className="grow">
-                <FormControl>
-                  <Input placeholder="Buscar filmes..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit">Buscar</Button>
-          {search && (
-            <Button type="button" variant="outline" onClick={handleClear}>
-              Limpar
+      <div className="w-full max-w-2xl mx-auto">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-2">
+            <FormField
+              control={form.control}
+              name="query"
+              render={({ field }) => (
+                <FormItem className="grow">
+                  <FormControl>
+                    <Input
+                      placeholder={placeholder}
+                      {...field}
+                      className="h-12 text-base"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" size="icon" className="h-12 w-12">
+              <Search className="h-5 w-5" />
             </Button>
-          )}
-        </form>
-      </Form>
+            {search && (
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={handleClear}
+                className="h-12 w-12"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            )}
+          </form>
+        </Form>
+      </div>
     </div>
   )
 }

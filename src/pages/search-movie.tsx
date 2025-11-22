@@ -1,15 +1,5 @@
 import { SearchMovieInput } from "@/components/search-movie-input"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-
-import { Link } from "react-router-dom"
+import { MovieCard } from "@/components/movie-card"
 
 export function SearchMoviePage() {
   const movies = Array.from({ length: 5 }).map((_, i) => ({
@@ -25,26 +15,14 @@ export function SearchMoviePage() {
       <SearchMovieInput />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
         {movies.map((movie) => (
-          <Card key={movie.id}>
-            <CardHeader>
-              <img
-                src={movie.poster_path}
-                alt={movie.title}
-                className="rounded-t-lg"
-              />
-            </CardHeader>
-            <CardContent>
-              <CardTitle>{movie.title}</CardTitle>
-              <CardDescription>
-                {movie.release_date} - {movie.vote_average.toFixed(1)}
-              </CardDescription>
-            </CardContent>
-            <CardFooter>
-              <Link to={`/movie/${movie.id}`} className="w-full">
-                <Button className="w-full">Details</Button>
-              </Link>
-            </CardFooter>
-          </Card>
+          <MovieCard
+            key={movie.id}
+            id={movie.id}
+            title={movie.title}
+            poster_path={movie.poster_path}
+            vote_average={movie.vote_average}
+            release_date={movie.release_date}
+          />
         ))}
       </div>
     </div>

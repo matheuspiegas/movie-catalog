@@ -8,8 +8,34 @@ import {
   getMovieRecommendations,
   getPersonDetails,
   getPersonMovieCredits,
+  getPopularTVShows,
+  getTrendingTVShows,
+  searchTVShows,
+  getTVShowDetails,
+  getTVShowCredits,
+  getTVShowRecommendations,
+  getTrendingAll,
 } from "@/services/tmdb"
 import { useQueryState } from "nuqs"
+
+// ========== Hooks para conteúdo misto (trending all) ==========
+
+export function useInfiniteTrendingAll(timeWindow: "day" | "week" = "day") {
+  return useInfiniteQuery({
+    queryKey: ["trending", "all", "infinite", timeWindow],
+    queryFn: ({ pageParam = 1 }) => getTrendingAll(timeWindow, pageParam),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.total_pages) {
+        return lastPage.page + 1
+      }
+      return undefined
+    },
+    initialPageParam: 1,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  })
+}
+
+// ========== Hooks para filmes ==========
 
 export function usePopularMovies(page: number = 1) {
   return useQuery({
@@ -88,8 +114,67 @@ export function usePersonDetails(personId: number) {
 
 export function usePersonMovieCredits(personId: number) {
   return useQuery({
-    queryKey: ["person", "credits", personId],
+    queryKey: ["person", "movie-credits", personId],
     queryFn: () => getPersonMovieCredits(personId),
+    staleTime: 1000 * 60 * 10, // 10 minutos
+  })
+}
+
+// ========== Hooks para Séries de TV ==========
+
+export function useInfinitePopularTVShows() {
+  const [search] = useQueryState("search")
+  return useInfiniteQuery({
+    queryKey: ["tv-shows", "popular", "infinite", search],
+    queryFn: ({ pageParam = 1 }) => getPopularTVShows(pageParam, search),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.total_pages) {
+        return lastPage.page + 1
+      }
+      return undefined
+    },
+    initialPageParam: 1,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  })
+}
+
+export function useTrendingTVShows(timeWindow: "day" | "week" = "day") {
+  return useQuery({
+    queryKey: ["tv-shows", "trending", timeWindow],
+    queryFn: () => getTrendingTVShows(timeWindow),
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  })
+}
+
+export function useSearchTVShows(query: string, page: number = 1) {
+  return useQuery({
+    queryKey: ["tv-shows", "search", query, page],
+    queryFn: () => searchTVShows(query, page),
+    enabled: query.length > 0,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  })
+}
+
+export function useTVShowDetails(tvId: number) {
+  return useQuery({
+    queryKey: ["tv-show", "details", tvId],
+    queryFn: () => getTVShowDetails(tvId),
+    staleTime: 1000 * 60 * 10, // 10 minutos
+  })
+}
+
+export function useTVShowCredits(tvId: number) {
+  return useQuery({
+    queryKey: ["tv-show", "credits", tvId],
+    queryFn: () => getTVShowCredits(tvId),
+    staleTime: 1000 * 60 * 10, // 10 minutos
+  })
+}
+
+export function useTVShowRecommendations(tvId: number) {
+  return useQuery({
+    queryKey: ["tv-show", "recommendations", tvId],
+    queryFn: () => getTVShowRecommendations(tvId),
     staleTime: 1000 * 60 * 10, // 10 minutos
   })
 }
