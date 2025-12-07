@@ -73,7 +73,7 @@ export function MovieCard({
             {showYear && release_date && (
               <>{new Date(release_date).getFullYear()} • </>
             )}
-            ⭐ {vote_average.toFixed(1)}
+            ⭐ {vote_average?.toFixed(1)}
           </CardDescription>
         </CardContent>
       </Link>
