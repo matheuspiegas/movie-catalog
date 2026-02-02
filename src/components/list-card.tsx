@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { List } from "@/services/lists"
+import type { List } from "@/services/api/lists"
 import { Link } from "react-router-dom"
 
 interface ListCardProps {

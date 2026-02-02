@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useCreateList } from "@/hooks/useLists"
+import { useCreateApiList } from "@/hooks/api/useLists"
 import { Loader2 } from "lucide-react"
 
 const createListSchema = z.object({
@@ -43,7 +43,7 @@ interface CreateListDialogProps {
 
 export function CreateListDialog({ children }: CreateListDialogProps) {
   const [open, setOpen] = useState(false)
-  const { mutate: createList, isPending } = useCreateList()
+  const { mutate: createList, isPending } = useCreateApiList()
 
   const form = useForm<CreateListFormData>({
     resolver: zodResolver(createListSchema),

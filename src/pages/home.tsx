@@ -28,7 +28,7 @@ export function HomePage() {
           fetchNextPage()
         }
       },
-      { threshold: 0.1 } // Ativa quando 10% do elemento está visível
+      { threshold: 0.1 }, // Ativa quando 10% do elemento está visível
     )
 
     const currentTarget = observerTarget.current
@@ -83,12 +83,15 @@ export function HomePage() {
   const mediaItems = data?.pages.flatMap((page) => page.results) || []
 
   // Remove duplicatas baseado no ID
-  const uniqueMediaItems = mediaItems.reduce((acc, item) => {
-    if (!acc.find((m) => m.id === item.id)) {
-      acc.push(item)
-    }
-    return acc
-  }, [] as typeof mediaItems)
+  const uniqueMediaItems = mediaItems.reduce(
+    (acc, item) => {
+      if (!acc.find((m) => m.id === item.id)) {
+        acc.push(item)
+      }
+      return acc
+    },
+    [] as typeof mediaItems,
+  )
 
   return (
     <div className="relative container py-8">
@@ -102,7 +105,7 @@ export function HomePage() {
         </div>
 
         <h2 className="text-2xl font-bold mb-6">Em Alta Esta Semana</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
           {uniqueMediaItems.map((item) => (
             <MovieCard
               key={`${item.media_type}-${item.id}`}

@@ -39,10 +39,11 @@ export function Navbar() {
             )}
             <Link
               to="/"
-              className="text-xl font-bold hover:opacity-80 transition whitespace-nowrap"
+              className="text-xl font-bold hover:opacity-80 transition whitespace-nowrap flex items-center justify-center"
               onClick={closeMenu}
             >
-              🎬 Catálogo
+              <img src="/movie3.svg" alt="Logo" className="h-6 w-6 mr-2" />
+              Movie catalog
             </Link>
           </div>
 

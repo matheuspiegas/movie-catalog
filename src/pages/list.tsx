@@ -18,14 +18,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useNavigate, useParams } from "react-router-dom"
-import { useListItems, useRemoveListItem } from "@/hooks/useListItems"
-import { useLists, useUpdateList, useDeleteList } from "@/hooks/useLists"
+import { useApiListItems, useRemoveApiListItem } from "@/hooks/api/useListItems"
+import { useApiLists, useUpdateApiList, useDeleteApiList } from "@/hooks/api/useLists"
 import { ArrowLeft, Edit, Trash2, Plus } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { toast } from "sonner"
 
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
@@ -47,13 +46,13 @@ export function ListPage() {
   >(null)
 
   // Queries
-  const { data: lists, isLoading: isLoadingLists } = useLists()
-  const { data: items, isLoading: isLoadingItems } = useListItems(id!)
+  const { data: lists, isLoading: isLoadingLists } = useApiLists()
+  const { data: items, isLoading: isLoadingItems } = useApiListItems(id!)
 
   // Mutations
-  const { mutate: updateList, isPending: isUpdating } = useUpdateList()
-  const { mutate: deleteList, isPending: isDeleting } = useDeleteList()
-  const { mutate: removeItem, isPending: isRemovingItem } = useRemoveListItem(
+  const { mutate: updateList, isPending: isUpdating } = useUpdateApiList()
+  const { mutate: deleteList, isPending: isDeleting } = useDeleteApiList()
+  const { mutate: removeItem, isPending: isRemovingItem } = useRemoveApiListItem(
     id!
   )
 
@@ -81,7 +80,6 @@ export function ListPage() {
       {
         onSuccess: () => {
           setIsEditDialogOpen(false)
-          toast.success("Lista atualizada com sucesso!")
           reset()
         },
       }
@@ -91,7 +89,6 @@ export function ListPage() {
   const handleDelete = () => {
     deleteList(id!, {
       onSuccess: () => {
-        toast.success("Lista deletada com sucesso!")
         navigate("/lists")
       },
     })
@@ -103,7 +100,6 @@ export function ListPage() {
       onSuccess: () => {
         setIsRemovingItemFromList(false)
         setItemToRemoveFromList(null)
-        toast.success("Item removido da lista com sucesso!")
       },
     })
   }

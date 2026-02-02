@@ -3,12 +3,19 @@ import {
   useMovieDetails,
   useMovieCredits,
   useMovieRecommendations,
+  useMovieVideos,
+  useMovieWatchProviders,
 } from "@/hooks/useMovies"
 import { getImageUrl } from "@/services/tmdb"
 import { CastCard } from "@/components/cast-card"
 import { RecommendationsCarousel } from "@/components/recommendations-carousel"
-import { Button } from "@/components/ui/button"
-import { Heart } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { MediaBackdrop } from "@/components/media-backdrop"
+import { MediaSidebar } from "@/components/media-sidebar"
+import { MediaInfoCard } from "@/components/media-info-card"
+import { MediaPageSkeleton } from "@/components/media-page-skeleton"
+import { VideoEmbed } from "@/components/video-embed"
+import { CrewSection } from "@/components/crew-section"
 import { useAddToList } from "@/contexts/add-to-list-context"
 
 export function MoviePage() {
@@ -24,15 +31,11 @@ export function MoviePage() {
   const { data: credits, isLoading: loadingCredits } = useMovieCredits(movieId)
   const { data: recommendations, isLoading: loadingRecs } =
     useMovieRecommendations(movieId)
+  const { data: videos } = useMovieVideos(movieId)
+  const { data: watchProviders } = useMovieWatchProviders(movieId)
 
   if (loadingMovie) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-lg text-muted-foreground">
-          Carregando detalhes do filme...
-        </p>
-      </div>
-    )
+    return <MediaPageSkeleton />
   }
 
   if (errorMovie || !movie) {
@@ -49,132 +52,171 @@ export function MoviePage() {
   }
 
   const cast = credits?.cast.slice(0, 12) || []
+  const crew = credits?.crew || []
   const recommendedMovies = recommendations?.results || []
 
-  return (
-    <div>
-      {/* Backdrop */}
-      {movie.backdrop_path && (
-        <div className="relative -mx-4 mb-8 h-[500px] overflow-hidden rounded-b-2xl">
-          <img
-            src={getImageUrl(movie.backdrop_path, "original")}
-            alt={movie.title}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-8">
-            <h1 className="text-5xl font-bold text-white mb-2 drop-shadow-lg">
-              {movie.title}
-            </h1>
-            {movie.tagline && (
-              <p className="text-xl text-white/90 italic drop-shadow-md">
-                "{movie.tagline}"
-              </p>
-            )}
-          </div>
-        </div>
-      )}
+  // Filtra apenas trailers oficiais em português ou inglês
+  const trailer =
+    videos?.results.find(
+      (video) =>
+        video.type === "Trailer" && video.site === "YouTube" && video.official,
+    ) ||
+    videos?.results.find(
+      (video) => video.type === "Trailer" && video.site === "YouTube",
+    )
 
-      {/* Detalhes do Filme */}
-      <div className="flex flex-col md:flex-row gap-8">
-        <img
-          src={getImageUrl(movie.poster_path, "w500")}
-          alt={movie.title}
-          className="w-full md:w-1/3 rounded-lg shadow-lg"
+  // Pega os provedores do Brasil (BR)
+  const brProviders = watchProviders?.results?.BR
+
+  return (
+    <div className="pb-8">
+      {/* Backdrop */}
+      <MediaBackdrop
+        backdropPath={movie.backdrop_path}
+        title={movie.title}
+        tagline={movie.tagline}
+      />
+
+      {/* Main Content */}
+      <div className="flex flex-col lg:flex-row gap-8 mb-8">
+        {/* Sidebar */}
+        <MediaSidebar
+          media={movie}
+          mediaType="movie"
+          watchProviders={brProviders}
+          onAddToList={() =>
+            openDialog({
+              movieId: movie.id,
+              movieTitle: movie.title,
+              moviePosterPath: movie.poster_path || undefined,
+              movieReleaseDate: movie.release_date,
+              movieVoteAverage: movie.vote_average.toString(),
+              mediaType: "movie",
+            })
+          }
         />
-        <div className="grow">
+
+        {/* Conteúdo Principal - Tabs */}
+        <div className="lg:w-2/3">
           {!movie.backdrop_path && (
-            <>
+            <div className="mb-6">
               <h1 className="text-4xl font-bold">{movie.title}</h1>
               {movie.tagline && (
-                <p className="text-xl text-muted-foreground italic my-2">
+                <p className="text-xl text-muted-foreground italic mt-2">
                   "{movie.tagline}"
                 </p>
               )}
-            </>
+            </div>
           )}
-          <div className="flex items-center gap-4 my-4">
-            <span className="flex items-center gap-1">
-              ⭐ {movie.vote_average.toFixed(1)}
-            </span>
-            <span className="text-muted-foreground">
-              ({movie.vote_count.toLocaleString()} votos)
-            </span>
-            <Button
-              onClick={() =>
-                openDialog({
-                  movieId: movie.id,
-                  movieTitle: movie.title,
-                  moviePosterPath: movie.poster_path || undefined,
-                  movieReleaseDate: movie.release_date,
-                  movieVoteAverage: movie.vote_average.toString(),
-                  mediaType: "movie",
-                })
-              }
-              className="ml-auto"
+
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="w-full grid grid-cols-3 mb-6 backdrop-blur-sm">
+              <TabsTrigger value="overview" className="transition-all">
+                Visão Geral
+              </TabsTrigger>
+              <TabsTrigger value="cast" className="transition-all">
+                Elenco e Equipe
+              </TabsTrigger>
+              <TabsTrigger value="recommendations" className="transition-all">
+                Recomendações
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Aba: Visão Geral */}
+            <TabsContent
+              value="overview"
+              className="space-y-6 mt-0 animate-in fade-in-50 duration-500"
             >
-              <Heart className="mr-2 h-4 w-4" />
-              Adicionar à Lista
-            </Button>
-          </div>
+              {/* Trailer */}
+              {trailer && (
+                <MediaInfoCard title="Trailer">
+                  <VideoEmbed videoKey={trailer.key} title={trailer.name} />
+                </MediaInfoCard>
+              )}
 
-          <p className="mb-4 text-muted-foreground">{movie.overview}</p>
+              {/* Sinopse */}
+              <MediaInfoCard title="Sinopse">
+                <p className="text-muted-foreground leading-relaxed">
+                  {movie.overview || "Sinopse não disponível."}
+                </p>
+              </MediaInfoCard>
 
-          <div className="space-y-2">
-            <p>
-              <strong>Data de Lançamento:</strong>{" "}
-              {new Date(movie.release_date).toLocaleDateString("pt-BR")}
-            </p>
-            <p>
-              <strong>Duração:</strong> {movie.runtime} minutos
-            </p>
-            <p>
-              <strong>Gêneros:</strong>{" "}
-              {movie.genres.map((g) => g.name).join(", ")}
-            </p>
-            {movie.budget > 0 && (
-              <p>
-                <strong>Orçamento:</strong> ${movie.budget.toLocaleString()}
-              </p>
-            )}
-            {movie.revenue > 0 && (
-              <p>
-                <strong>Receita:</strong> ${movie.revenue.toLocaleString()}
-              </p>
-            )}
-            <p>
-              <strong>Produção:</strong>{" "}
-              {movie.production_companies.map((p) => p.name).join(", ")}
-            </p>
-          </div>
+              {/* Produção */}
+              {movie.production_companies.length > 0 && (
+                <MediaInfoCard title="Produção">
+                  <div className="flex flex-wrap gap-6">
+                    {movie.production_companies.map((company) => (
+                      <div
+                        key={company.id}
+                        className="flex items-center gap-3 text-sm group"
+                      >
+                        {company.logo_path && (
+                          <img
+                            src={getImageUrl(company.logo_path, "w500")}
+                            alt={company.name}
+                            className="h-10 object-contain transition-transform group-hover:scale-110"
+                          />
+                        )}
+                        <span className="group-hover:text-primary transition-colors">
+                          {company.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </MediaInfoCard>
+              )}
+            </TabsContent>
+
+            {/* Aba: Elenco e Equipe */}
+            <TabsContent
+              value="cast"
+              className="space-y-8 mt-0 animate-in fade-in-50 duration-500"
+            >
+              {/* Equipe Principal */}
+              {!loadingCredits && crew.length > 0 && (
+                <MediaInfoCard>
+                  <CrewSection crew={crew} />
+                </MediaInfoCard>
+              )}
+
+              {/* Elenco */}
+              {!loadingCredits && cast.length > 0 && (
+                <MediaInfoCard title="Elenco Principal">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {cast.map((person) => (
+                      <CastCard
+                        key={person.id}
+                        id={person.id}
+                        name={person.name}
+                        character={person.character}
+                        profile_path={person.profile_path}
+                      />
+                    ))}
+                  </div>
+                </MediaInfoCard>
+              )}
+            </TabsContent>
+
+            {/* Aba: Recomendações */}
+            <TabsContent
+              value="recommendations"
+              className="mt-0 animate-in fade-in-50 duration-500"
+            >
+              {!loadingRecs && recommendedMovies.length > 0 ? (
+                <MediaInfoCard title="Filmes Recomendados">
+                  <RecommendationsCarousel items={recommendedMovies} />
+                </MediaInfoCard>
+              ) : (
+                <MediaInfoCard>
+                  <p className="text-muted-foreground text-center py-6">
+                    Nenhuma recomendação disponível no momento.
+                  </p>
+                </MediaInfoCard>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
-
-      {/* Elenco */}
-      {!loadingCredits && cast.length > 0 && (
-        <div className="my-8">
-          <h2 className="text-3xl font-bold mb-4">Elenco</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {cast.map((person) => (
-              <CastCard
-                key={person.id}
-                id={person.id}
-                name={person.name}
-                character={person.character}
-                profile_path={person.profile_path}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Recomendações */}
-      {!loadingRecs && recommendedMovies.length > 0 && (
-        <div className="my-8">
-          <h2 className="text-3xl font-bold mb-4">Recomendações</h2>
-          <RecommendationsCarousel items={recommendedMovies} />
-        </div>
-      )}
     </div>
   )
 }

@@ -13,10 +13,12 @@ import { TVShowPage } from "./pages/tv-show"
 import { AddToListProvider } from "./contexts/add-to-list-context"
 import { Toaster } from "sonner"
 import { SearchPage } from "./pages/search"
+import { ScrollToTop } from "./components/scroll-to-top"
 
 export default function App() {
   return (
     <AddToListProvider>
+      <ScrollToTop />
       <Toaster position="top-center" />
       <Routes>
         <Route element={<Layout />}>

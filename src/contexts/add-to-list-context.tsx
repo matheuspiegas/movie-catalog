@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react"
 import { AddToListDialog } from "@/components/add-to-list-dialog"
-import type { AddListItemInput } from "@/services/list-items"
+import type { AddListItemInput } from "@/services/api/list-items"
 
 interface AddToListContextType {
   openDialog: (movieData: AddListItemInput & { movieId: number }) => void

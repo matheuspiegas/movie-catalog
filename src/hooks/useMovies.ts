@@ -6,6 +6,8 @@ import {
   getMovieDetails,
   getMovieCredits,
   getMovieRecommendations,
+  getMovieVideos,
+  getMovieWatchProviders,
   getPersonDetails,
   getPersonMovieCredits,
   getPopularTVShows,
@@ -14,6 +16,8 @@ import {
   getTVShowDetails,
   getTVShowCredits,
   getTVShowRecommendations,
+  getTVShowVideos,
+  getTVShowWatchProviders,
   getTrendingAll,
 } from "@/services/tmdb"
 import { useQueryState } from "nuqs"
@@ -104,6 +108,22 @@ export function useMovieRecommendations(movieId: number) {
   })
 }
 
+export function useMovieVideos(movieId: number) {
+  return useQuery({
+    queryKey: ["movie", "videos", movieId],
+    queryFn: () => getMovieVideos(movieId),
+    staleTime: 1000 * 60 * 30, // 30 minutos (vídeos mudam raramente)
+  })
+}
+
+export function useMovieWatchProviders(movieId: number) {
+  return useQuery({
+    queryKey: ["movie", "watch-providers", movieId],
+    queryFn: () => getMovieWatchProviders(movieId),
+    staleTime: 1000 * 60 * 60, // 1 hora (providers mudam pouco)
+  })
+}
+
 export function usePersonDetails(personId: number) {
   return useQuery({
     queryKey: ["person", "details", personId],
@@ -176,5 +196,21 @@ export function useTVShowRecommendations(tvId: number) {
     queryKey: ["tv-show", "recommendations", tvId],
     queryFn: () => getTVShowRecommendations(tvId),
     staleTime: 1000 * 60 * 10, // 10 minutos
+  })
+}
+
+export function useTVShowVideos(tvId: number) {
+  return useQuery({
+    queryKey: ["tv-show", "videos", tvId],
+    queryFn: () => getTVShowVideos(tvId),
+    staleTime: 1000 * 60 * 30, // 30 minutos (vídeos mudam raramente)
+  })
+}
+
+export function useTVShowWatchProviders(tvId: number) {
+  return useQuery({
+    queryKey: ["tv-show", "watch-providers", tvId],
+    queryFn: () => getTVShowWatchProviders(tvId),
+    staleTime: 1000 * 60 * 60, // 1 hora (providers mudam pouco)
   })
 }

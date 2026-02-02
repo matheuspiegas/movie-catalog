@@ -1,4 +1,4 @@
-import { useLists } from "@/hooks/useLists"
+import { useApiLists } from "@/hooks/api/useLists"
 import { ListCard } from "@/components/list-card"
 import { EmptyListsState } from "@/components/empty-lists-state"
 import { CreateListDialog } from "@/components/create-list-dialog"
@@ -9,7 +9,7 @@ import { useUser, SignInButton } from "@clerk/clerk-react"
 
 export function ListsPage() {
   const { user, isLoaded } = useUser()
-  const { data: lists, isLoading, isError, error } = useLists()
+  const { data: lists, isLoading, isError, error } = useApiLists()
 
   // Aguardar carregamento do Clerk
   if (!isLoaded || isLoading) {

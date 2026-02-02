@@ -66,9 +66,18 @@ export interface MovieDetails {
   popularity: number
 }
 
+export interface CrewMember {
+  id: number
+  name: string
+  job: string
+  department: string
+  profile_path: string | null
+}
+
 export interface CreditsResponse {
   id: number
   cast: CastMember[]
+  crew: CrewMember[]
 }
 
 export interface PersonDetails {
@@ -121,6 +130,16 @@ export interface TVShow {
   original_language: string
 }
 
+export interface Season {
+  id: number
+  name: string
+  overview: string
+  poster_path: string | null
+  season_number: number
+  episode_count: number
+  air_date: string
+}
+
 export interface TVShowDetails {
   id: number
   name: string
@@ -138,6 +157,7 @@ export interface TVShowDetails {
   number_of_seasons: number
   number_of_episodes: number
   episode_run_time: number[]
+  seasons: Season[]
   status: string
   original_language: string
   popularity: number
@@ -178,6 +198,44 @@ export interface MediaResponse {
   results: MediaItem[]
   total_pages: number
   total_results: number
+}
+
+// Interface para vídeos (trailers)
+export interface Video {
+  id: string
+  key: string
+  name: string
+  site: string
+  type: string
+  official: boolean
+  published_at: string
+}
+
+export interface VideosResponse {
+  id: number
+  results: Video[]
+}
+
+// Interface para plataformas de streaming
+export interface WatchProvider {
+  logo_path: string
+  provider_id: number
+  provider_name: string
+  display_priority: number
+}
+
+export interface CountryWatchProviders {
+  link: string
+  flatrate?: WatchProvider[]
+  rent?: WatchProvider[]
+  buy?: WatchProvider[]
+}
+
+export interface WatchProvidersResponse {
+  id: number
+  results: {
+    [countryCode: string]: CountryWatchProviders
+  }
 }
 
 // Buscar filmes populares ou fazer busca
@@ -324,6 +382,36 @@ export async function getMovieRecommendations(
   return response.json()
 }
 
+// Buscar vídeos/trailers de um filme
+export async function getMovieVideos(movieId: number): Promise<VideosResponse> {
+  const response = await fetch(
+    `${BASE_URL}/movie/${movieId}/videos?language=pt-BR`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar vídeos do filme")
+  }
+
+  return response.json()
+}
+
+// Buscar plataformas de streaming onde o filme está disponível
+export async function getMovieWatchProviders(
+  movieId: number
+): Promise<WatchProvidersResponse> {
+  const response = await fetch(
+    `${BASE_URL}/movie/${movieId}/watch/providers`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar plataformas de streaming")
+  }
+
+  return response.json()
+}
+
 // Buscar detalhes de uma pessoa
 export async function getPersonDetails(
   personId: number
@@ -465,6 +553,36 @@ export async function getTVShowRecommendations(
 
   if (!response.ok) {
     throw new Error("Erro ao buscar recomendações")
+  }
+
+  return response.json()
+}
+
+// Buscar vídeos/trailers de uma série
+export async function getTVShowVideos(tvId: number): Promise<VideosResponse> {
+  const response = await fetch(
+    `${BASE_URL}/tv/${tvId}/videos?language=pt-BR`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar vídeos da série")
+  }
+
+  return response.json()
+}
+
+// Buscar plataformas de streaming onde a série está disponível
+export async function getTVShowWatchProviders(
+  tvId: number
+): Promise<WatchProvidersResponse> {
+  const response = await fetch(
+    `${BASE_URL}/tv/${tvId}/watch/providers`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    throw new Error("Erro ao buscar plataformas de streaming")
   }
 
   return response.json()

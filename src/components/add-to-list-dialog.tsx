@@ -8,14 +8,15 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useLists } from "@/hooks/useLists"
+import { useApiLists } from "@/hooks/api/useLists"
 import { Check, Plus } from "lucide-react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import type { AddListItemInput } from "@/services/list-items"
-import { listItemsService } from "@/services/list-items"
+import { useAuth } from "@clerk/clerk-react"
+import type { AddListItemInput } from "@/services/api/list-items"
+import { apiListItemsService } from "@/services/api/list-items"
 import { useQueryClient } from "@tanstack/react-query"
-import { listItemsKeys } from "@/hooks/useListItems"
+import { apiListItemsKeys } from "@/hooks/api/useListItems"
 
 interface AddToListDialogProps {
   open: boolean
@@ -29,8 +30,9 @@ export function AddToListDialog({
   movieData,
 }: AddToListDialogProps) {
   const navigate = useNavigate()
+  const { getToken } = useAuth()
   const queryClient = useQueryClient()
-  const { data: lists, isLoading } = useLists()
+  const { data: lists, isLoading } = useApiLists()
   const [addingToListId, setAddingToListId] = useState<string | null>(null)
   const [successListId, setSuccessListId] = useState<string | null>(null)
 
@@ -38,10 +40,13 @@ export function AddToListDialog({
     setAddingToListId(listId)
 
     try {
-      await listItemsService.addListItem(listId, movieData)
+      const token = await getToken()
+      if (!token) throw new Error("Não autenticado")
+
+      await apiListItemsService.addListItem(token, listId, movieData)
 
       // Invalida o cache da lista
-      queryClient.invalidateQueries({ queryKey: listItemsKeys.all(listId) })
+      queryClient.invalidateQueries({ queryKey: apiListItemsKeys.all(listId) })
 
       // Mostra feedback de sucesso
       setSuccessListId(listId)
