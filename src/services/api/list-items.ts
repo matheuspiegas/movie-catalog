@@ -3,7 +3,7 @@
  * Endpoints: /api/lists/:listId/items
  */
 
-import { apiClient } from "./client"
+import { apiRequest } from "./request"
 
 /**
  * Interface do item de lista retornado pela API
@@ -48,10 +48,9 @@ export const apiListItemsService = {
    * Buscar todos os itens de uma lista
    * GET /api/lists/:listId/items
    */
-  async getListItems(token: string, listId: string): Promise<ListItem[]> {
-    const response = await apiClient<GetListItemsResponse>(
+  async getListItems(listId: string): Promise<ListItem[]> {
+    const response = await apiRequest<GetListItemsResponse>(
       `/lists/${listId}/items`,
-      token,
       {
         method: "GET",
       }
@@ -64,18 +63,17 @@ export const apiListItemsService = {
    * POST /api/lists/:listId/items
    */
   async addListItem(
-    token: string,
     listId: string,
     input: AddListItemInput
   ): Promise<ListItem> {
-    return await apiClient<ListItem>(
+    const response = await apiRequest<{ item: ListItem }>(
       `/lists/${listId}/items`,
-      token,
       {
         method: "POST",
         body: JSON.stringify(input),
       }
     )
+    return response.item
   },
 
   /**
@@ -83,17 +81,9 @@ export const apiListItemsService = {
    * DELETE /api/lists/:listId/items/:itemId
    * Retorna 204 No Content
    */
-  async removeListItem(
-    token: string,
-    listId: string,
-    itemId: string
-  ): Promise<void> {
-    await apiClient<void>(
-      `/lists/${listId}/items/${itemId}`,
-      token,
-      {
-        method: "DELETE",
-      }
-    )
+  async removeListItem(listId: string, itemId: string): Promise<void> {
+    await apiRequest<void>(`/lists/${listId}/items/${itemId}`, {
+      method: "DELETE",
+    })
   },
 }

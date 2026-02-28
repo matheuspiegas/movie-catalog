@@ -11,8 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useApiLists } from "@/hooks/api/useLists"
 import { Check, Plus } from "lucide-react"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { useAuth } from "@clerk/clerk-react"
+import { useRouter } from "next/navigation"
 import type { AddListItemInput } from "@/services/api/list-items"
 import { apiListItemsService } from "@/services/api/list-items"
 import { useQueryClient } from "@tanstack/react-query"
@@ -29,8 +28,7 @@ export function AddToListDialog({
   onOpenChange,
   movieData,
 }: AddToListDialogProps) {
-  const navigate = useNavigate()
-  const { getToken } = useAuth()
+  const router = useRouter()
   const queryClient = useQueryClient()
   const { data: lists, isLoading } = useApiLists()
   const [addingToListId, setAddingToListId] = useState<string | null>(null)
@@ -40,10 +38,7 @@ export function AddToListDialog({
     setAddingToListId(listId)
 
     try {
-      const token = await getToken()
-      if (!token) throw new Error("Não autenticado")
-
-      await apiListItemsService.addListItem(token, listId, movieData)
+      await apiListItemsService.addListItem(listId, movieData)
 
       // Invalida o cache da lista
       queryClient.invalidateQueries({ queryKey: apiListItemsKeys.all(listId) })
@@ -128,7 +123,7 @@ export function AddToListDialog({
               <Button
                 onClick={() => {
                   onOpenChange(false)
-                  navigate("/lists")
+                  router.push("/lists")
                 }}
               >
                 <Plus className="mr-2 h-4 w-4" />

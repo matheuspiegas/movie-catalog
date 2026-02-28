@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import type { List } from "@/services/api/lists"
-import { Link } from "react-router-dom"
+import Link from "next/link"
 
 interface ListCardProps {
   list: List
@@ -14,7 +14,7 @@ interface ListCardProps {
 
 export function ListCard({ list }: ListCardProps) {
   return (
-    <Link to={`/list/${list.id}`}>
+    <Link href={`/list/${list.id}`}>
       <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
         <CardHeader className="min-h-18">
           <div className="flex flex-col gap-3 items-start justify-between">

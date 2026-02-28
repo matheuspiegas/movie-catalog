@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useAuth } from "@clerk/clerk-react"
 import { toast } from "sonner"
 import {
   apiListsService,
@@ -19,14 +18,10 @@ export const apiListsKeys = {
  * Hook para buscar todas as listas do usuário autenticado
  */
 export function useApiLists() {
-  const { getToken } = useAuth()
-
   return useQuery({
     queryKey: apiListsKeys.all,
     queryFn: async () => {
-      const token = await getToken()
-      if (!token) throw new Error("Não autenticado")
-      return apiListsService.getLists(token)
+      return apiListsService.getLists()
     },
     staleTime: 1000 * 60 * 5, // 5 minutos
   })
@@ -36,14 +31,11 @@ export function useApiLists() {
  * Hook para criar uma nova lista
  */
 export function useCreateApiList() {
-  const { getToken } = useAuth()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (input: CreateListInput) => {
-      const token = await getToken()
-      if (!token) throw new Error("Não autenticado")
-      return apiListsService.createList(token, input)
+      return apiListsService.createList(input)
     },
     onSuccess: () => {
       // Invalida o cache para recarregar a lista
@@ -60,7 +52,6 @@ export function useCreateApiList() {
  * Hook para atualizar uma lista existente
  */
 export function useUpdateApiList() {
-  const { getToken } = useAuth()
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -71,9 +62,7 @@ export function useUpdateApiList() {
       id: string
       input: UpdateListInput
     }) => {
-      const token = await getToken()
-      if (!token) throw new Error("Não autenticado")
-      return apiListsService.updateList(token, id, input)
+      return apiListsService.updateList(id, input)
     },
     onSuccess: () => {
       // Invalida o cache para refletir as mudanças
@@ -90,14 +79,11 @@ export function useUpdateApiList() {
  * Hook para deletar uma lista
  */
 export function useDeleteApiList() {
-  const { getToken } = useAuth()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const token = await getToken()
-      if (!token) throw new Error("Não autenticado")
-      return apiListsService.deleteList(token, id)
+      return apiListsService.deleteList(id)
     },
     onSuccess: () => {
       // Invalida o cache para remover a lista deletada

@@ -1,34 +1,43 @@
-import { Link, useNavigate, useLocation } from "react-router-dom"
+'use client'
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
 import {
   SignedIn,
   SignedOut,
   SignInButton,
   UserButton,
-} from "@clerk/clerk-react"
+} from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
+import { LayoutContainer } from "@/components/layout-container"
 import { ArrowLeft, Menu, X } from "lucide-react"
 import { useState } from "react"
 
 export function Navbar() {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const router = useRouter()
+  const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   // Verifica se pode voltar (não está na home e tem histórico)
-  const canGoBack = location.pathname !== "/" && window.history.length > 1
+  const canGoBack = pathname !== "/" && window.history.length > 1
 
   const handleGoBack = () => {
-    navigate(-1)
+    router.back()
   }
 
   const closeMenu = () => {
     setIsMenuOpen(false)
   }
 
+  const mobileMenuClassName = `md:hidden absolute left-0 right-0 top-full bg-primary border-t border-primary-foreground/20 shadow-lg transition-[opacity,transform,max-height] duration-200 ease-in-out overflow-hidden ${
+    isMenuOpen
+      ? "opacity-100 translate-y-0 max-h-[calc(100vh-4rem)]"
+      : "opacity-0 -translate-y-2 max-h-0 pointer-events-none"
+  }`
+
   return (
     <nav className="bg-primary text-primary-foreground shadow-md fixed top-0 left-0 right-0 z-50">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
+      <LayoutContainer>
+        <div className="flex items-center justify-between h-16">
           {/* Logo e Back Button */}
           <div className="flex items-center gap-2">
             {canGoBack && (
@@ -38,7 +47,7 @@ export function Navbar() {
               />
             )}
             <Link
-              to="/"
+              href="/"
               className="text-xl font-bold hover:opacity-80 transition whitespace-nowrap flex items-center justify-center"
               onClick={closeMenu}
             >
@@ -50,31 +59,31 @@ export function Navbar() {
           {/* Desktop Menu */}
           <ul className="hidden md:flex gap-6 items-center">
             <li>
-              <Link to="/" className="hover:underline">
-                Início
-              </Link>
-            </li>
-            <li>
-              <Link to="/movies" className="hover:underline">
-                Filmes
-              </Link>
-            </li>
-            <li>
-              <Link to="/series" className="hover:underline">
-                Séries
-              </Link>
-            </li>
+                <Link href="/" className="hover:underline">
+                  Início
+                </Link>
+              </li>
+              <li>
+                <Link href="/movies" className="hover:underline">
+                  Filmes
+                </Link>
+              </li>
+              <li>
+                <Link href="/series" className="hover:underline">
+                  Séries
+                </Link>
+              </li>
             {/* <li>
               <Link to="/search/movie" className="hover:underline">
                 Buscar
               </Link>
             </li> */}
-            <li>
-              <Link to="/lists" className="hover:underline">
-                Minhas listas
-              </Link>
-            </li>
-          </ul>
+              <li>
+                <Link href="/lists" className="hover:underline">
+                  Minhas listas
+                </Link>
+              </li>
+            </ul>
 
           {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-3">
@@ -107,14 +116,15 @@ export function Navbar() {
             )}
           </button>
         </div>
+      </LayoutContainer>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-primary-foreground/20 pt-4">
-            <ul className="flex flex-col gap-4">
+      {/* Mobile Menu */}
+      <div className={mobileMenuClassName}>
+        <LayoutContainer className="py-4">
+          <ul className="flex flex-col gap-4">
               <li>
                 <Link
-                  to="/"
+                  href="/"
                   className="block hover:underline"
                   onClick={closeMenu}
                 >
@@ -123,7 +133,7 @@ export function Navbar() {
               </li>
               <li>
                 <Link
-                  to="/movies"
+                  href="/movies"
                   className="block hover:underline"
                   onClick={closeMenu}
                 >
@@ -132,7 +142,7 @@ export function Navbar() {
               </li>
               <li>
                 <Link
-                  to="/series"
+                  href="/series"
                   className="block hover:underline"
                   onClick={closeMenu}
                 >
@@ -150,7 +160,7 @@ export function Navbar() {
               </li> */}
               <li>
                 <Link
-                  to="/lists"
+                  href="/lists"
                   className="block hover:underline"
                   onClick={closeMenu}
                 >
@@ -160,29 +170,28 @@ export function Navbar() {
             </ul>
 
             {/* Mobile Auth */}
-            <div className="mt-4 pt-4 border-t border-primary-foreground/20">
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <Button variant="secondary" className="w-full">
-                    Entrar
-                  </Button>
-                </SignInButton>
-              </SignedOut>
-              <SignedIn>
-                <div className="flex items-center gap-3">
-                  <UserButton
-                    appearance={{
-                      elements: {
-                        avatarBox: "w-10 h-10",
-                      },
-                    }}
-                  />
-                  <span className="text-sm">Minha conta</span>
-                </div>
-              </SignedIn>
-            </div>
+          <div className="mt-4 pt-4 border-t border-primary-foreground/20">
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button variant="secondary" className="w-full">
+                  Entrar
+                </Button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <div className="flex items-center gap-3">
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-10 h-10",
+                    },
+                  }}
+                />
+                <span className="text-sm">Minha conta</span>
+              </div>
+            </SignedIn>
           </div>
-        )}
+        </LayoutContainer>
       </div>
     </nav>
   )

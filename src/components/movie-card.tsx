@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import Link from "next/link"
 import {
   Card,
   CardContent,
@@ -48,7 +48,7 @@ export function MovieCard({
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow pt-0 h-full flex flex-col group relative">
       <CardHeader className="p-0 relative">
-        <Link to={`/${mediaType}/${id}`}>
+        <Link href={`/${mediaType}/${id}`}>
           <img
             src={getImageUrl(poster_path, "w500")}
             alt={title}
@@ -64,7 +64,7 @@ export function MovieCard({
           <Heart className="h-4 w-4" />
         </Button>
       </CardHeader>
-      <Link to={`/${mediaType}/${id}`} className="contents">
+      <Link href={`/${mediaType}/${id}`} className="contents">
         <CardContent className="pt-4 grow flex flex-col">
           <CardTitle className="line-clamp-2 text-base min-h-12">
             {title}
