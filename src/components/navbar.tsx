@@ -18,7 +18,7 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   // Verifica se pode voltar (não está na home e tem histórico)
-  const canGoBack = pathname !== "/" && window.history.length > 1
+  const canGoBack = pathname !== "/" && typeof window !== 'undefined' && window.history.length > 1
 
   const handleGoBack = () => {
     router.back()

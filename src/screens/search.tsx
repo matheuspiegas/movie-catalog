@@ -15,6 +15,8 @@ export function SearchPage() {
 
   // Controlar visibilidade do botão de scroll to top
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400)
     }
@@ -24,7 +26,9 @@ export function SearchPage() {
   }, [])
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
   }
 
   const {

@@ -49,6 +49,8 @@ export function MoviesPage() {
 
   // Controlar visibilidade do botão de scroll to top
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    
     const handleScroll = () => {
       // Mostrar botão quando rolar mais de 400px
       setShowScrollTop(window.scrollY > 400)
@@ -59,7 +61,9 @@ export function MoviesPage() {
   }, [])
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
   }
 
   if (isLoading) {
