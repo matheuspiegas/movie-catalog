@@ -3,7 +3,6 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useAuth } from "@clerk/clerk-react"
 import { toast } from "sonner"
 import {
   apiListItemsService,
@@ -22,14 +21,10 @@ export const apiListItemsKeys = {
  * Hook para buscar todos os itens de uma lista
  */
 export function useApiListItems(listId: string) {
-  const { getToken } = useAuth()
-
   return useQuery({
     queryKey: apiListItemsKeys.all(listId),
     queryFn: async () => {
-      const token = await getToken()
-      if (!token) throw new Error("Não autenticado")
-      return apiListItemsService.getListItems(token, listId)
+      return apiListItemsService.getListItems(listId)
     },
     enabled: !!listId,
     staleTime: 1000 * 60 * 5, // 5 minutos
@@ -40,14 +35,11 @@ export function useApiListItems(listId: string) {
  * Hook para adicionar item à lista
  */
 export function useAddApiListItem(listId: string) {
-  const { getToken } = useAuth()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (input: AddListItemInput) => {
-      const token = await getToken()
-      if (!token) throw new Error("Não autenticado")
-      return apiListItemsService.addListItem(token, listId, input)
+      return apiListItemsService.addListItem(listId, input)
     },
     onSuccess: () => {
       // Invalida o cache para recarregar os itens
@@ -64,14 +56,11 @@ export function useAddApiListItem(listId: string) {
  * Hook para remover item da lista
  */
 export function useRemoveApiListItem(listId: string) {
-  const { getToken } = useAuth()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (itemId: string) => {
-      const token = await getToken()
-      if (!token) throw new Error("Não autenticado")
-      return apiListItemsService.removeListItem(token, listId, itemId)
+      return apiListItemsService.removeListItem(listId, itemId)
     },
     onSuccess: () => {
       // Invalida o cache dos itens da lista

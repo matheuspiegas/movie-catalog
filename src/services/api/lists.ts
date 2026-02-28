@@ -1,4 +1,4 @@
-import { apiClient } from "./client"
+import { apiRequest } from "./request"
 
 /**
  * Interface da lista conforme retornada pelo backend
@@ -38,8 +38,8 @@ interface GetListsResponse {
 /**
  * Busca todas as listas do usuário autenticado
  */
-async function getLists(token: string): Promise<List[]> {
-  const response = await apiClient<GetListsResponse>("/lists", token, {
+async function getLists(): Promise<List[]> {
+  const response = await apiRequest<GetListsResponse>("/lists", {
     method: "GET",
   })
   return response.lists
@@ -48,32 +48,33 @@ async function getLists(token: string): Promise<List[]> {
 /**
  * Cria uma nova lista
  */
-async function createList(token: string, input: CreateListInput): Promise<List> {
-  return await apiClient<List>("/lists", token, {
+async function createList(input: CreateListInput): Promise<List> {
+  const response = await apiRequest<{ list: List }>("/lists", {
     method: "POST",
     body: JSON.stringify(input),
   })
+  return response.list
 }
 
 /**
  * Atualiza uma lista existente
  */
 async function updateList(
-  token: string,
   id: string,
   input: UpdateListInput
 ): Promise<List> {
-  return await apiClient<List>(`/lists/${id}`, token, {
+  const response = await apiRequest<{ list: List }>(`/lists/${id}`, {
     method: "PUT",
     body: JSON.stringify(input),
   })
+  return response.list
 }
 
 /**
  * Deleta uma lista
  */
-async function deleteList(token: string, id: string): Promise<void> {
-  await apiClient<void>(`/lists/${id}`, token, {
+async function deleteList(id: string): Promise<void> {
+  await apiRequest<void>(`/lists/${id}`, {
     method: "DELETE",
   })
 }

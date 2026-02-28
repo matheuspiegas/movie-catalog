@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "./ui/button"
 import { Search, X } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { usePathname, useRouter } from "next/navigation"
 import { useQueryState } from "nuqs"
 import { useEffect } from "react"
 
@@ -20,7 +20,8 @@ const searchSchema = z.object({
 })
 
 export function GlobalSearchInput() {
-  const navigate = useNavigate()
+  const router = useRouter()
+  const pathname = usePathname()
   const [query, setQuery] = useQueryState("query")
 
   const form = useForm({
@@ -42,17 +43,17 @@ export function GlobalSearchInput() {
     const searchQuery = data.query.trim()
 
     // Se já estiver na página de busca, apenas atualiza a query
-    if (window.location.pathname === "/search") {
+    if (pathname === "/search") {
       setQuery(searchQuery)
     } else {
       // Se não, navega para a página de busca
-      navigate(`/search?query=${encodeURIComponent(searchQuery)}`)
+      router.push(`/search?query=${encodeURIComponent(searchQuery)}`)
     }
   }
 
   function handleClear() {
     form.reset({ query: "" })
-    navigate("/")
+    router.push("/")
   }
 
   return (

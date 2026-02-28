@@ -14,7 +14,7 @@ export function MediaBackdrop({
   if (!backdropPath) return null
 
   return (
-    <div className="relative -mx-4 mb-8 h-[300px] sm:h-[400px] lg:h-[500px] overflow-hidden rounded-b-xl shadow-xl">
+    <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mb-8 h-[300px] sm:h-[400px] lg:h-[500px] overflow-hidden rounded-b-xl shadow-xl">
       <img
         src={getImageUrl(backdropPath, "original")}
         alt={title}

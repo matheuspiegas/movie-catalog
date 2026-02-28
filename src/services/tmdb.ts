@@ -1,4 +1,4 @@
-const READ_ACCESS_TOKEN = import.meta.env.VITE_TMDB_READ_ACCESS_TOKEN
+const READ_ACCESS_TOKEN = process.env.NEXT_PUBLIC_TMDB_READ_ACCESS_TOKEN
 const BASE_URL = "https://api.themoviedb.org/3"
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p"
 

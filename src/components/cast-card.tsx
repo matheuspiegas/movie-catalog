@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import Link from "next/link"
 import {
   Card,
   CardContent,
@@ -16,7 +16,7 @@ interface CastCardProps {
 
 export function CastCard({ id, name, character, profile_path }: CastCardProps) {
   return (
-    <Link to={`/person/${id}`}>
+    <Link href={`/person/${id}`}>
       <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 pt-0 group">
         <div className="overflow-hidden">
           <img
