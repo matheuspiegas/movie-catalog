@@ -35,7 +35,7 @@ export const invitationsService = {
     // 1. Verify list exists and inviter is owner
     const listRows = await db.select().from(lists).where(eq(lists.id, listId)).limit(1)
     const list = listRows[0]
-    if (!list) throw new NotFoundError("List not found")
+    if (!list) throw new NotFoundError("Lista nao encontrada")
     
     const memberRows = await db
       .select()
@@ -44,14 +44,14 @@ export const invitationsService = {
       .limit(1)
     
     if (!memberRows[0] || memberRows[0].role !== "owner") {
-      throw new ForbiddenError("Only list owners can invite members")
+      throw new ForbiddenError("Apenas o dono da lista pode convidar membros")
     }
 
     // 2. Validate invitee email exists in Clerk
     const client = await clerkClient()
     const clerkUsers = await client.users.getUserList({ emailAddress: [inviteeEmail] })
     if (clerkUsers.totalCount === 0) {
-      throw new ValidationError("User with this email not found")
+      throw new ValidationError("Nenhum usuario encontrado com este e-mail")
     }
     const inviteeUserId = clerkUsers.data[0].id
 
@@ -63,7 +63,7 @@ export const invitationsService = {
       .limit(1)
     
     if (existingMember[0]) {
-      throw new ConflictError("User is already a member of this list")
+      throw new ConflictError("Este usuario ja faz parte da lista")
     }
 
     // 4. Check for existing pending invitation
@@ -74,7 +74,7 @@ export const invitationsService = {
       .limit(1)
     
     if (existingInvite[0] && existingInvite[0].status === "pending") {
-      throw new ConflictError("Invitation already sent to this user")
+      throw new ConflictError("Ja existe um convite pendente para este usuario")
     }
 
     // 5. Create invitation
@@ -107,7 +107,12 @@ export const invitationsService = {
     return rows.map(row => toInvitationDto(row.invitation, row.list.name))
   },
 
-  async accept(invitationId: string, userId: string, userEmail: string): Promise<void> {
+  async accept(
+    invitationId: string,
+    userId: string,
+    userEmail: string,
+    userName: string,
+  ): Promise<void> {
     const rows = await db
       .select()
       .from(invitations)
@@ -115,18 +120,19 @@ export const invitationsService = {
       .limit(1)
     
     const invitation = rows[0]
-    if (!invitation) throw new NotFoundError("Invitation not found")
+    if (!invitation) throw new NotFoundError("Convite nao encontrado")
     if (invitation.inviteeEmail !== userEmail) {
-      throw new ForbiddenError("This invitation is not for you")
+      throw new ForbiddenError("Este convite nao pertence a voce")
     }
     if (invitation.status !== "pending") {
-      throw new ConflictError("Invitation already responded to")
+      throw new ConflictError("Este convite ja foi respondido")
     }
 
     // Add user as member
     await db.insert(listMembers).values({
       listId: invitation.listId,
       userId,
+      userName,
       role: "member",
     })
 
@@ -145,12 +151,12 @@ export const invitationsService = {
       .limit(1)
     
     const invitation = rows[0]
-    if (!invitation) throw new NotFoundError("Invitation not found")
+    if (!invitation) throw new NotFoundError("Convite nao encontrado")
     if (invitation.inviteeEmail !== userEmail) {
-      throw new ForbiddenError("This invitation is not for you")
+      throw new ForbiddenError("Este convite nao pertence a voce")
     }
     if (invitation.status !== "pending") {
-      throw new ConflictError("Invitation already responded to")
+      throw new ConflictError("Este convite ja foi respondido")
     }
 
     // Update invitation status

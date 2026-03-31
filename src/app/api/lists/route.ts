@@ -3,7 +3,7 @@ import { requireUserId } from "@/lib/auth"
 import { handleApiError } from "@/lib/errors"
 import { createListSchema } from "@/lib/schemas/lists.schema"
 import { listsService } from "@/lib/services/lists"
-import { auth } from "@clerk/nextjs/server"
+import { getUserSnapshotName } from "@/lib/clerk-users"
 
 
 export async function GET() {
@@ -21,7 +21,10 @@ export async function POST(request: Request) {
   try {
     const userId = await requireUserId()
     const body = createListSchema.parse(await request.json())
-    const list = await listsService.create(userId, body)
+    const list = await listsService.create(userId, {
+      ...body,
+      userName: await getUserSnapshotName(userId),
+    })
 
     return NextResponse.json({ list }, { status: 201 })
   } catch (error) {

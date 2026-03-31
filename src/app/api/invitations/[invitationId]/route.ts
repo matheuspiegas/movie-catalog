@@ -3,6 +3,7 @@ import { requireUserId } from "@/lib/auth"
 import { handleApiError } from "@/lib/errors"
 import { invitationsService } from "@/lib/services/invitations"
 import { clerkClient } from "@clerk/nextjs/server"
+import { getUserDisplayName } from "@/lib/clerk-users"
 
 export async function POST(
   request: Request,
@@ -19,7 +20,7 @@ export async function POST(
     
     if (!email) {
       return NextResponse.json(
-        { message: "Email not found for user" },
+        { message: "Nao foi possivel encontrar o e-mail do usuario" },
         { status: 400 }
       )
     }
@@ -28,14 +29,19 @@ export async function POST(
     const { action } = body
 
     if (action === "accept") {
-      await invitationsService.accept(invitationId, userId, email)
-      return NextResponse.json({ message: "Invitation accepted" }, { status: 200 })
+      await invitationsService.accept(
+        invitationId,
+        userId,
+        email,
+        getUserDisplayName(user),
+      )
+      return NextResponse.json({ message: "Convite aceito" }, { status: 200 })
     } else if (action === "reject") {
       await invitationsService.reject(invitationId, email)
-      return NextResponse.json({ message: "Invitation rejected" }, { status: 200 })
+      return NextResponse.json({ message: "Convite recusado" }, { status: 200 })
     } else {
       return NextResponse.json(
-        { message: "Invalid action. Use 'accept' or 'reject'" },
+        { message: "Acao invalida. Use 'accept' ou 'reject'" },
         { status: 400 }
       )
     }

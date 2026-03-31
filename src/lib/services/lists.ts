@@ -11,7 +11,7 @@ import {
 } from "@/lib/schemas/lists.schema"
 import { listMembersService } from "./list-members"
 
-type CreateListInput = z.infer<typeof createListSchema>
+type CreateListInput = z.infer<typeof createListSchema> & { userName: string }
 type UpdateListInput = z.infer<typeof updateListSchema>
 type ListRow = InferSelectModel<typeof lists>
 
@@ -65,6 +65,7 @@ export const listsService = {
     await db.insert(listMembers).values({
       listId: rows[0].id,
       userId,
+      userName: data.userName,
       role: "owner",
     })
 
@@ -79,18 +80,18 @@ export const listsService = {
     const existing = await getListById(listId)
 
     if (!existing) {
-      throw new NotFoundError("List not found")
+      throw new NotFoundError("Lista nao encontrada")
     }
 
     // Check if user has permission (owner or member)
     const permission = await listMembersService.checkPermission(listId, userId)
     if (!permission.isMember) {
-      throw new ForbiddenError("You do not have access to this list")
+      throw new ForbiddenError("Voce nao tem acesso a esta lista")
     }
 
     // Only owners can update list metadata
     if (!permission.isOwner) {
-      throw new ForbiddenError("Only list owners can update list details")
+      throw new ForbiddenError("Apenas o dono da lista pode editar os detalhes")
     }
 
     const rows = await db
@@ -110,13 +111,13 @@ export const listsService = {
     const existing = await getListById(listId)
 
     if (!existing) {
-      throw new NotFoundError("List not found")
+      throw new NotFoundError("Lista nao encontrada")
     }
 
     // Check if user is owner
     const permission = await listMembersService.checkPermission(listId, userId)
     if (!permission.isOwner) {
-      throw new ForbiddenError("Only list owners can delete lists")
+      throw new ForbiddenError("Apenas o dono da lista pode excluir a lista")
     }
 
     await db.delete(lists).where(eq(lists.id, listId))

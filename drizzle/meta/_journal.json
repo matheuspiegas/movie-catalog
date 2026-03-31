@@ -8,6 +8,13 @@
       "when": 1774922710181,
       "tag": "0000_simple_killraven",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774926318000,
+      "tag": "0001_add_user_name_to_list_members",
+      "breakpoints": true
     }
   ]
 }

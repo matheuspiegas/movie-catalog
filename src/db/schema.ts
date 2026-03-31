@@ -45,9 +45,7 @@ export const invitations = pgTable(
       .notNull(),
     respondedAt: timestamp("responded_at", { withTimezone: false }),
   },
-  (table) => ({
-    uniqueListInvitee: unique().on(table.listId, table.inviteeEmail),
-  }),
+  (table) => [unique().on(table.listId, table.inviteeEmail)],
 )
 
 export const listMembers = pgTable(
@@ -58,12 +56,11 @@ export const listMembers = pgTable(
       .notNull()
       .references(() => lists.id, { onDelete: "cascade" }),
     userId: text("user_id").notNull(),
+    userName: text("user_name").notNull(),
     role: text("role").notNull(), // 'owner' | 'member'
     joinedAt: timestamp("joined_at", { withTimezone: false })
       .defaultNow()
       .notNull(),
   },
-  (table) => ({
-    uniqueListUser: unique().on(table.listId, table.userId),
-  }),
+  (table) => [unique().on(table.listId, table.userId)],
 )
