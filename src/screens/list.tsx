@@ -70,8 +70,6 @@ export function ListPage() {
   const currentUserMember = members?.find((m) => m.userId === user?.id)
   const isOwner = currentUserMember?.role === "owner"
 
-  const list = lists?.find((l) => l.id === id)
-
   // Form
   const {
     register,
