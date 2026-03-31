@@ -43,6 +43,16 @@ const editListSchema = z.object({
 
 type EditListFormData = z.infer<typeof editListSchema>
 
+const formatAddedAt = (value: string) => {
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  return new Intl.DateTimeFormat("pt-BR").format(date)
+}
+
 export function ListPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
@@ -198,14 +208,62 @@ export function ListPage() {
               <ListItemsSkeleton />
             ) : items && items.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
-                {items.map((item) => (
-                  <Card
-                    key={item.id}
-                    className="overflow-hidden hover:shadow-lg transition-shadow pt-0 h-full flex flex-col group relative"
-                  >
-                    <CardHeader className="p-0 relative">
+                {items.map((item) => {
+                  const canRemoveItem = isOwner || item.addedBy === user?.id
+
+                  return (
+                    <Card
+                      key={item.id}
+                      className="overflow-hidden hover:shadow-lg transition-shadow pt-0 h-full flex flex-col group relative"
+                    >
+                      <CardHeader className="p-0 relative">
+                        <div
+                          className="cursor-pointer"
+                          onClick={() =>
+                            router.push(
+                              item.mediaType === "movie"
+                                ? `/movie/${item.movieId}`
+                                : `/tv/${item.movieId}`
+                            )
+                          }
+                        >
+                          {item.moviePosterPath ? (
+                            <img
+                              src={`${IMAGE_BASE_URL}${item.moviePosterPath}`}
+                              alt={item.movieTitle}
+                              className="w-full h-auto aspect-2/3 object-cover"
+                            />
+                          ) : (
+                            <div className="w-full aspect-2/3 bg-muted flex items-center justify-center">
+                              <span className="text-muted-foreground text-sm">
+                                Sem imagem
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          className={`absolute top-2 right-2 transition-opacity shadow-lg ${
+                            canRemoveItem
+                              ? "md:opacity-0 md:group-hover:opacity-100"
+                              : "opacity-50"
+                          }`}
+                          disabled={!canRemoveItem || isRemovingItem}
+                          onClick={() => {
+                            if (!canRemoveItem) {
+                              return
+                            }
+
+                            setIsRemovingItemFromList(true)
+                            setItemToRemoveFromList(item.id)
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </CardHeader>
                       <div
-                        className="cursor-pointer"
+                        className="contents cursor-pointer"
                         onClick={() =>
                           router.push(
                             item.mediaType === "movie"
@@ -214,56 +272,24 @@ export function ListPage() {
                           )
                         }
                       >
-                        {item.moviePosterPath ? (
-                          <img
-                            src={`${IMAGE_BASE_URL}${item.moviePosterPath}`}
-                            alt={item.movieTitle}
-                            className="w-full h-auto aspect-2/3 object-cover"
-                          />
-                        ) : (
-                          <div className="w-full aspect-2/3 bg-muted flex items-center justify-center">
-                            <span className="text-muted-foreground text-sm">
-                              Sem imagem
-                            </span>
-                          </div>
-                        )}
+                        <CardContent className="pt-4 grow flex flex-col">
+                          <CardTitle className="line-clamp-2 text-base min-h-12">
+                            {item.movieTitle}
+                          </CardTitle>
+                          <CardDescription className="mt-2">
+                            {item.movieReleaseDate && (
+                              <>{item.movieReleaseDate.split("-")[0]} • </>
+                            )}
+                            {item.movieVoteAverage && <>⭐ {item.movieVoteAverage}</>}
+                          </CardDescription>
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            Por {item.addedByName} • {formatAddedAt(item.addedAt)}
+                          </p>
+                        </CardContent>
                       </div>
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        className="absolute top-2 right-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg"
-                        onClick={() => {
-                          setIsRemovingItemFromList(true)
-                          setItemToRemoveFromList(item.id)
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </CardHeader>
-                    <div
-                      className="contents cursor-pointer"
-                      onClick={() =>
-                      router.push(
-                        item.mediaType === "movie"
-                          ? `/movie/${item.movieId}`
-                          : `/tv/${item.movieId}`
-                      )
-                      }
-                    >
-                      <CardContent className="pt-4 grow flex flex-col">
-                        <CardTitle className="line-clamp-2 text-base min-h-12">
-                          {item.movieTitle}
-                        </CardTitle>
-                        <CardDescription className="mt-2">
-                          {item.movieReleaseDate && (
-                            <>{item.movieReleaseDate.split("-")[0]} • </>
-                          )}
-                          {item.movieVoteAverage && <>⭐ {item.movieVoteAverage}</>}
-                        </CardDescription>
-                      </CardContent>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  )
+                })}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed rounded-lg">

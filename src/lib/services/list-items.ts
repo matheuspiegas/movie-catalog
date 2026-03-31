@@ -3,7 +3,7 @@ import type { z } from "zod"
 import { and, eq } from "drizzle-orm"
 import type { InferSelectModel } from "drizzle-orm"
 import { db } from "@/lib/db"
-import { listItems, lists } from "@/db/schema"
+import { listItems, listMembers, lists } from "@/db/schema"
 import {
   ConflictError,
   ForbiddenError,
@@ -26,9 +26,10 @@ export type ListItemDto = {
   mediaType: string
   addedAt: string
   addedBy: string
+  addedByName: string
 }
 
-const toListItemDto = (item: ListItemRow): ListItemDto => ({
+const toListItemDto = (item: ListItemRow, addedByName?: string): ListItemDto => ({
   id: item.id,
   listId: item.listId,
   movieId: item.movieId,
@@ -39,6 +40,7 @@ const toListItemDto = (item: ListItemRow): ListItemDto => ({
   mediaType: item.mediaType,
   addedAt: item.addedAt.toISOString(),
   addedBy: item.addedBy,
+  addedByName: addedByName ?? item.addedBy,
 })
 
 const assertListAccess = async (listId: string, userId: string) => {
@@ -46,13 +48,13 @@ const assertListAccess = async (listId: string, userId: string) => {
   const list = rows[0]
 
   if (!list) {
-    throw new NotFoundError("List not found")
+    throw new NotFoundError("Lista nao encontrada")
   }
 
   // Check if user has access to this list
   const permission = await listMembersService.checkPermission(listId, userId)
   if (!permission.isMember) {
-    throw new ForbiddenError("You do not have access to this list")
+    throw new ForbiddenError("Voce nao tem acesso a esta lista")
   }
 
   return permission
@@ -62,11 +64,21 @@ export const listItemsService = {
   async getAllByList(listId: string, userId: string): Promise<ListItemDto[]> {
     await assertListAccess(listId, userId)
     const rows = await db
-      .select()
+      .select({
+        item: listItems,
+        addedByName: listMembers.userName,
+      })
       .from(listItems)
+      .leftJoin(
+        listMembers,
+        and(
+          eq(listMembers.listId, listItems.listId),
+          eq(listMembers.userId, listItems.addedBy),
+        ),
+      )
       .where(eq(listItems.listId, listId))
 
-    return rows.map(toListItemDto)
+    return rows.map((row) => toListItemDto(row.item, row.addedByName ?? undefined))
   },
 
   async create(
@@ -90,7 +102,7 @@ export const listItemsService = {
       .limit(1)
 
     if (existingItem.length > 0) {
-      throw new ConflictError("Item already in list")
+      throw new ConflictError("Este item ja esta na lista")
     }
 
     const rows = await db
@@ -107,7 +119,15 @@ export const listItemsService = {
       })
       .returning()
 
-    return toListItemDto(rows[0])
+    const memberRows = await db
+      .select({ userName: listMembers.userName })
+      .from(listMembers)
+      .where(
+        and(eq(listMembers.listId, listId), eq(listMembers.userId, userId)),
+      )
+      .limit(1)
+
+    return toListItemDto(rows[0], memberRows[0]?.userName)
   },
 
   async delete(listId: string, itemId: string, userId: string): Promise<void> {
@@ -120,12 +140,12 @@ export const listItemsService = {
       .limit(1)
 
     if (existingItem.length === 0) {
-      throw new NotFoundError("Item not found")
+      throw new NotFoundError("Item nao encontrado")
     }
 
     // Owners can delete any item, members can only delete their own
     if (!permission.isOwner && existingItem[0].addedBy !== userId) {
-      throw new ForbiddenError("You can only delete items you added")
+      throw new ForbiddenError("Voce so pode remover itens adicionados por voce")
     }
 
     await db.delete(listItems).where(eq(listItems.id, itemId))

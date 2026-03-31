@@ -19,6 +19,8 @@ export interface ListItem {
   movieVoteAverage: string | null
   mediaType: string // "movie" | "tv"
   addedAt: string // ISO string
+  addedBy: string
+  addedByName: string
 }
 
 /**
