@@ -1,14 +1,15 @@
 import "server-only"
 import type { z } from "zod"
-import { eq } from "drizzle-orm"
+import { eq, inArray } from "drizzle-orm"
 import type { InferSelectModel } from "drizzle-orm"
 import { db } from "@/lib/db"
-import { lists } from "@/db/schema"
+import { lists, listMembers } from "@/db/schema"
 import { ForbiddenError, NotFoundError } from "@/lib/errors"
 import {
   createListSchema,
   updateListSchema,
 } from "@/lib/schemas/lists.schema"
+import { listMembersService } from "./list-members"
 
 type CreateListInput = z.infer<typeof createListSchema>
 type UpdateListInput = z.infer<typeof updateListSchema>
@@ -39,7 +40,14 @@ const getListById = async (listId: string) => {
 
 export const listsService = {
   async getAllByUser(userId: string): Promise<ListDto[]> {
-    const rows = await db.select().from(lists).where(eq(lists.userId, userId))
+    // Get all list IDs where user is a member
+    const listIds = await listMembersService.getUserListIds(userId)
+    
+    if (listIds.length === 0) {
+      return []
+    }
+
+    const rows = await db.select().from(lists).where(inArray(lists.id, listIds))
     return rows.map(toListDto)
   },
 
@@ -52,6 +60,13 @@ export const listsService = {
         userId,
       })
       .returning()
+
+    // Add creator as owner in list_members
+    await db.insert(listMembers).values({
+      listId: rows[0].id,
+      userId,
+      role: "owner",
+    })
 
     return toListDto(rows[0])
   },
@@ -67,8 +82,15 @@ export const listsService = {
       throw new NotFoundError("List not found")
     }
 
-    if (existing.userId !== userId) {
-      throw new ForbiddenError("List does not belong to user")
+    // Check if user has permission (owner or member)
+    const permission = await listMembersService.checkPermission(listId, userId)
+    if (!permission.isMember) {
+      throw new ForbiddenError("You do not have access to this list")
+    }
+
+    // Only owners can update list metadata
+    if (!permission.isOwner) {
+      throw new ForbiddenError("Only list owners can update list details")
     }
 
     const rows = await db
@@ -91,8 +113,10 @@ export const listsService = {
       throw new NotFoundError("List not found")
     }
 
-    if (existing.userId !== userId) {
-      throw new ForbiddenError("List does not belong to user")
+    // Check if user is owner
+    const permission = await listMembersService.checkPermission(listId, userId)
+    if (!permission.isOwner) {
+      throw new ForbiddenError("Only list owners can delete lists")
     }
 
     await db.delete(lists).where(eq(lists.id, listId))

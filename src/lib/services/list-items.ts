@@ -10,6 +10,7 @@ import {
   NotFoundError,
 } from "@/lib/errors"
 import { createListItemSchema } from "@/lib/schemas/list-items.schema"
+import { listMembersService } from "./list-members"
 
 type CreateListItemInput = z.infer<typeof createListItemSchema>
 type ListItemRow = InferSelectModel<typeof listItems>
@@ -24,6 +25,7 @@ export type ListItemDto = {
   movieVoteAverage: string | null
   mediaType: string
   addedAt: string
+  addedBy: string
 }
 
 const toListItemDto = (item: ListItemRow): ListItemDto => ({
@@ -36,9 +38,10 @@ const toListItemDto = (item: ListItemRow): ListItemDto => ({
   movieVoteAverage: item.movieVoteAverage,
   mediaType: item.mediaType,
   addedAt: item.addedAt.toISOString(),
+  addedBy: item.addedBy,
 })
 
-const assertListOwnership = async (listId: string, userId: string) => {
+const assertListAccess = async (listId: string, userId: string) => {
   const rows = await db.select().from(lists).where(eq(lists.id, listId)).limit(1)
   const list = rows[0]
 
@@ -46,14 +49,18 @@ const assertListOwnership = async (listId: string, userId: string) => {
     throw new NotFoundError("List not found")
   }
 
-  if (list.userId !== userId) {
-    throw new ForbiddenError("List does not belong to user")
+  // Check if user has access to this list
+  const permission = await listMembersService.checkPermission(listId, userId)
+  if (!permission.isMember) {
+    throw new ForbiddenError("You do not have access to this list")
   }
+
+  return permission
 }
 
 export const listItemsService = {
   async getAllByList(listId: string, userId: string): Promise<ListItemDto[]> {
-    await assertListOwnership(listId, userId)
+    await assertListAccess(listId, userId)
     const rows = await db
       .select()
       .from(listItems)
@@ -67,7 +74,8 @@ export const listItemsService = {
     userId: string,
     data: CreateListItemInput
   ): Promise<ListItemDto> {
-    await assertListOwnership(listId, userId)
+    // Members can add items
+    await assertListAccess(listId, userId)
 
     const existingItem = await db
       .select()
@@ -95,6 +103,7 @@ export const listItemsService = {
         movieReleaseDate: data.movieReleaseDate ?? null,
         movieVoteAverage: data.movieVoteAverage ?? null,
         mediaType: data.mediaType,
+        addedBy: userId,
       })
       .returning()
 
@@ -102,7 +111,7 @@ export const listItemsService = {
   },
 
   async delete(listId: string, itemId: string, userId: string): Promise<void> {
-    await assertListOwnership(listId, userId)
+    const permission = await assertListAccess(listId, userId)
 
     const existingItem = await db
       .select()
@@ -112,6 +121,11 @@ export const listItemsService = {
 
     if (existingItem.length === 0) {
       throw new NotFoundError("Item not found")
+    }
+
+    // Owners can delete any item, members can only delete their own
+    if (!permission.isOwner && existingItem[0].addedBy !== userId) {
+      throw new ForbiddenError("You can only delete items you added")
     }
 
     await db.delete(listItems).where(eq(listItems.id, itemId))
