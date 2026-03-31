@@ -2,21 +2,24 @@ import { NextResponse } from "next/server"
 import { requireUserId } from "@/lib/auth"
 import { handleApiError } from "@/lib/errors"
 import { invitationsService } from "@/lib/services/invitations"
-import { auth } from "@clerk/nextjs/server"
+import { clerkClient } from "@clerk/nextjs/server"
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ invitationId: string }> }
 ) {
   try {
-    const { sessionClaims } = await auth()
     const userId = await requireUserId()
     const { invitationId } = await params
     
-    const email = sessionClaims?.email as string | undefined
+    // Get user email from Clerk
+    const client = await clerkClient()
+    const user = await client.users.getUser(userId)
+    const email = user.emailAddresses[0]?.emailAddress
+    
     if (!email) {
       return NextResponse.json(
-        { message: "Email not found in session" },
+        { message: "Email not found for user" },
         { status: 400 }
       )
     }
