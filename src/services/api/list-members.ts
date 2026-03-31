@@ -4,6 +4,7 @@ export interface ListMember {
   id: string
   listId: string
   userId: string
+  userName: string
   role: "owner" | "member"
   joinedAt: string
 }

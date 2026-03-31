@@ -1,9 +1,18 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { useListMembers, useRemoveMember } from "@/hooks/api/useListMembers"
 import { Crown, Trash2, User } from "lucide-react"
 import { useUser } from "@clerk/nextjs"
+import { useState } from "react"
 
 interface ListMembersListProps {
   listId: string
@@ -14,11 +23,24 @@ export function ListMembersList({ listId, isOwner }: ListMembersListProps) {
   const { user } = useUser()
   const { data: members, isLoading, error } = useListMembers(listId)
   const removeMemberMutation = useRemoveMember()
+  const [memberToRemove, setMemberToRemove] = useState<{
+    userId: string
+    userName: string
+  } | null>(null)
 
-  const handleRemove = (memberId: string) => {
-    if (confirm("Tem certeza que deseja remover este membro?")) {
-      removeMemberMutation.mutate({ listId, memberId })
+  const handleRemove = () => {
+    if (!memberToRemove) {
+      return
     }
+
+    removeMemberMutation.mutate(
+      { listId, memberId: memberToRemove.userId },
+      {
+        onSuccess: () => {
+          setMemberToRemove(null)
+        },
+      },
+    )
   }
 
   if (isLoading) {
@@ -70,7 +92,7 @@ export function ListMembersList({ listId, isOwner }: ListMembersListProps) {
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  {member.userId}
+                  {member.userName}
                   {isCurrentUser && (
                     <span className="ml-2 text-xs text-muted-foreground">(Você)</span>
                   )}
@@ -82,18 +104,58 @@ export function ListMembersList({ listId, isOwner }: ListMembersListProps) {
             </div>
 
             {canRemove && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleRemove(member.userId)}
-                disabled={removeMemberMutation.isPending}
-              >
-                <Trash2 className="h-4 w-4 text-destructive" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    setMemberToRemove({
+                      userId: member.userId,
+                      userName: member.userName,
+                    })
+                  }
+                  disabled={removeMemberMutation.isPending}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
             )}
           </div>
         )
       })}
+      <Dialog
+        open={memberToRemove !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setMemberToRemove(null)
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remover membro</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja remover
+              {memberToRemove ? ` "${memberToRemove.userName}"` : " este membro"}
+              ? Essa pessoa perdera o acesso a esta lista.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setMemberToRemove(null)}
+              disabled={removeMemberMutation.isPending}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleRemove}
+              disabled={removeMemberMutation.isPending}
+            >
+              {removeMemberMutation.isPending ? "Removendo..." : "Remover"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
