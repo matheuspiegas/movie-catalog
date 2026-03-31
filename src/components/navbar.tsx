@@ -9,13 +9,16 @@ import {
 } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { LayoutContainer } from "@/components/layout-container"
-import { ArrowLeft, Menu, X } from "lucide-react"
+import { ArrowLeft, Bell, Menu, X } from "lucide-react"
 import { useState } from "react"
+import { usePendingInvitations } from "@/hooks/api/useInvitations"
 
 export function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { data: invitations } = usePendingInvitations()
+  const pendingCount = invitations?.length || 0
 
   // Verifica se pode voltar (não está na home e tem histórico)
   const canGoBack = pathname !== "/" && typeof window !== 'undefined' && window.history.length > 1
@@ -73,16 +76,23 @@ export function Navbar() {
                   Séries
                 </Link>
               </li>
-            {/* <li>
-              <Link to="/search/movie" className="hover:underline">
-                Buscar
-              </Link>
-            </li> */}
               <li>
                 <Link href="/lists" className="hover:underline">
                   Minhas listas
                 </Link>
               </li>
+              <SignedIn>
+                <li>
+                  <Link href="/invitations" className="hover:underline relative">
+                    <Bell className="h-5 w-5" />
+                    {pendingCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                        {pendingCount}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              </SignedIn>
             </ul>
 
           {/* Desktop Auth */}
@@ -149,15 +159,6 @@ export function Navbar() {
                   Séries
                 </Link>
               </li>
-              {/* <li>
-                <Link
-                  to="/search/movie"
-                  className="block hover:underline"
-                  onClick={closeMenu}
-                >
-                  Buscar
-                </Link>
-              </li> */}
               <li>
                 <Link
                   href="/lists"
@@ -167,6 +168,23 @@ export function Navbar() {
                   Minhas listas
                 </Link>
               </li>
+              <SignedIn>
+                <li>
+                  <Link
+                    href="/invitations"
+                    className="block hover:underline flex items-center gap-2"
+                    onClick={closeMenu}
+                  >
+                    <Bell className="h-5 w-5" />
+                    Convites
+                    {pendingCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {pendingCount}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              </SignedIn>
             </ul>
 
             {/* Mobile Auth */}

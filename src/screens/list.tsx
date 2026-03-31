@@ -20,14 +20,19 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useParams, useRouter } from "next/navigation"
 import { useApiListItems, useRemoveApiListItem } from "@/hooks/api/useListItems"
 import { useApiLists, useUpdateApiList, useDeleteApiList } from "@/hooks/api/useLists"
-import { ArrowLeft, Edit, Trash2, Plus } from "lucide-react"
+import { useListMembers } from "@/hooks/api/useListMembers"
+import { ArrowLeft, Edit, Trash2, Plus, Users } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { InviteMemberDialog } from "@/components/invite-member-dialog"
+import { ListMembersList } from "@/components/list-members-list"
+import { useUser } from "@clerk/nextjs"
 
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
@@ -41,6 +46,7 @@ type EditListFormData = z.infer<typeof editListSchema>
 export function ListPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
+  const { user } = useUser()
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isRemovingItemFromList, setIsRemovingItemFromList] = useState(false)
@@ -51,6 +57,7 @@ export function ListPage() {
   // Queries
   const { data: lists, isLoading: isLoadingLists } = useApiLists()
   const { data: items, isLoading: isLoadingItems } = useApiListItems(id!)
+  const { data: members } = useListMembers(id!)
 
   // Mutations
   const { mutate: updateList, isPending: isUpdating } = useUpdateApiList()
@@ -58,6 +65,10 @@ export function ListPage() {
   const { mutate: removeItem, isPending: isRemovingItem } = useRemoveApiListItem(
     id!
   )
+
+  const list = lists?.find((l) => l.id === id)
+  const currentUserMember = members?.find((m) => m.userId === user?.id)
+  const isOwner = currentUserMember?.role === "owner"
 
   const list = lists?.find((l) => l.id === id)
 
@@ -138,119 +149,153 @@ export function ListPage() {
           </div>
 
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditDialogOpen(true)}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setIsDeleteDialogOpen(true)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            {isOwner && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditDialogOpen(true)}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Items Count */}
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            {items?.length || 0} {items?.length === 1 ? "item" : "itens"}
-          </p>
-          <Button size="sm" onClick={() => router.push("/")}>
-            <Plus className="mr-2 h-4 w-4" />
-            Adicionar Filmes/Séries
-          </Button>
-        </div>
+        {/* Tabs: Items and Members */}
+        <Tabs defaultValue="items" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="items">
+              Itens ({items?.length || 0})
+            </TabsTrigger>
+            <TabsTrigger value="members">
+              <Users className="mr-2 h-4 w-4" />
+              Membros ({members?.length || 0})
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Items Grid */}
-        {isLoadingItems ? (
-          <ListItemsSkeleton />
-        ) : items && items.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
-            {items.map((item) => (
-              <Card
-                key={item.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow pt-0 h-full flex flex-col group relative"
-              >
-                <CardHeader className="p-0 relative">
-                  <div
-                    className="cursor-pointer"
-                    onClick={() =>
+          {/* Items Tab */}
+          <TabsContent value="items" className="space-y-4">
+            {/* Items Count and Add Button */}
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {items?.length || 0} {items?.length === 1 ? "item" : "itens"}
+              </p>
+              <Button size="sm" onClick={() => router.push("/")}>
+                <Plus className="mr-2 h-4 w-4" />
+                Adicionar Filmes/Séries
+              </Button>
+            </div>
+
+            {/* Items Grid */}
+            {isLoadingItems ? (
+              <ListItemsSkeleton />
+            ) : items && items.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+                {items.map((item) => (
+                  <Card
+                    key={item.id}
+                    className="overflow-hidden hover:shadow-lg transition-shadow pt-0 h-full flex flex-col group relative"
+                  >
+                    <CardHeader className="p-0 relative">
+                      <div
+                        className="cursor-pointer"
+                        onClick={() =>
+                          router.push(
+                            item.mediaType === "movie"
+                              ? `/movie/${item.movieId}`
+                              : `/tv/${item.movieId}`
+                          )
+                        }
+                      >
+                        {item.moviePosterPath ? (
+                          <img
+                            src={`${IMAGE_BASE_URL}${item.moviePosterPath}`}
+                            alt={item.movieTitle}
+                            className="w-full h-auto aspect-2/3 object-cover"
+                          />
+                        ) : (
+                          <div className="w-full aspect-2/3 bg-muted flex items-center justify-center">
+                            <span className="text-muted-foreground text-sm">
+                              Sem imagem
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        className="absolute top-2 right-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg"
+                        onClick={() => {
+                          setIsRemovingItemFromList(true)
+                          setItemToRemoveFromList(item.id)
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </CardHeader>
+                    <div
+                      className="contents cursor-pointer"
+                      onClick={() =>
                       router.push(
                         item.mediaType === "movie"
                           ? `/movie/${item.movieId}`
                           : `/tv/${item.movieId}`
                       )
-                    }
-                  >
-                    {item.moviePosterPath ? (
-                      <img
-                        src={`${IMAGE_BASE_URL}${item.moviePosterPath}`}
-                        alt={item.movieTitle}
-                        className="w-full h-auto aspect-2/3 object-cover"
-                      />
-                    ) : (
-                      <div className="w-full aspect-2/3 bg-muted flex items-center justify-center">
-                        <span className="text-muted-foreground text-sm">
-                          Sem imagem
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="absolute top-2 right-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg"
-                    onClick={() => {
-                      setIsRemovingItemFromList(true)
-                      setItemToRemoveFromList(item.id)
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </CardHeader>
-                <div
-                  className="contents cursor-pointer"
-                  onClick={() =>
-                  router.push(
-                    item.mediaType === "movie"
-                      ? `/movie/${item.movieId}`
-                      : `/tv/${item.movieId}`
-                  )
-                  }
-                >
-                  <CardContent className="pt-4 grow flex flex-col">
-                    <CardTitle className="line-clamp-2 text-base min-h-12">
-                      {item.movieTitle}
-                    </CardTitle>
-                    <CardDescription className="mt-2">
-                      {item.movieReleaseDate && (
-                        <>{item.movieReleaseDate.split("-")[0]} • </>
-                      )}
-                      {item.movieVoteAverage && <>⭐ {item.movieVoteAverage}</>}
-                    </CardDescription>
-                  </CardContent>
-                </div>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed rounded-lg">
-            <Plus className="h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Lista vazia</h3>
-            <p className="text-muted-foreground mb-6">
-              Adicione filmes e séries à sua lista
-            </p>
-            <Button onClick={() => router.push("/")}>
-              <Plus className="mr-2 h-4 w-4" />
-              Buscar Filmes/Séries
-            </Button>
-          </div>
-        )}
+                      }
+                    >
+                      <CardContent className="pt-4 grow flex flex-col">
+                        <CardTitle className="line-clamp-2 text-base min-h-12">
+                          {item.movieTitle}
+                        </CardTitle>
+                        <CardDescription className="mt-2">
+                          {item.movieReleaseDate && (
+                            <>{item.movieReleaseDate.split("-")[0]} • </>
+                          )}
+                          {item.movieVoteAverage && <>⭐ {item.movieVoteAverage}</>}
+                        </CardDescription>
+                      </CardContent>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed rounded-lg">
+                <Plus className="h-16 w-16 text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Lista vazia</h3>
+                <p className="text-muted-foreground mb-6">
+                  Adicione filmes e séries à sua lista
+                </p>
+                <Button onClick={() => router.push("/")}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Buscar Filmes/Séries
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Members Tab */}
+          <TabsContent value="members" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Gerencie quem tem acesso a esta lista
+              </p>
+              {isOwner && (
+                <InviteMemberDialog listId={id!} />
+              )}
+            </div>
+
+            <ListMembersList listId={id!} isOwner={isOwner} />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Edit Dialog */}
