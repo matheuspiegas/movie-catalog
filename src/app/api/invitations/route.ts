@@ -15,7 +15,7 @@ export async function GET() {
     
     if (!email) {
       return NextResponse.json(
-        { message: "Email not found for user" },
+        { message: "Nao foi possivel encontrar o e-mail do usuario" },
         { status: 400 }
       )
     }
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     
     if (!listId || !inviteeEmail) {
       return NextResponse.json(
-        { message: "listId and inviteeEmail are required" },
+        { message: "listId e inviteeEmail sao obrigatorios" },
         { status: 400 }
       )
     }

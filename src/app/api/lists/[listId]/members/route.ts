@@ -4,14 +4,14 @@ import { handleApiError } from "@/lib/errors"
 import { listMembersService } from "@/lib/services/list-members"
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ listId: string }> }
 ) {
   try {
-    await requireUserId()
+    const userId = await requireUserId()
     const { listId } = await params
     
-    const members = await listMembersService.getByListId(listId)
+    const members = await listMembersService.getByListId(listId, userId)
     return NextResponse.json({ members }, { status: 200 })
   } catch (error) {
     return handleApiError(error)
