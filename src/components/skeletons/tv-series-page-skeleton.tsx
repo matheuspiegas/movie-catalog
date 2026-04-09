@@ -1,6 +1,6 @@
 import { MediaGrid } from "@/components/media-grid"
-import { Skeleton } from "@/components/ui/skeleton"
 import { MediaCardSkeleton } from "@/components/skeletons/media-card-skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const mediaItems = Array.from({ length: 10 })
 

@@ -1,9 +1,11 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2, UserPlus } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -22,9 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import { useCreateInvitation } from "@/hooks/api/useInvitations"
-import { Loader2, UserPlus } from "lucide-react"
 
 const inviteSchema = z.object({
   email: z.string().email("Digite um e-mail válido"),
@@ -37,7 +37,10 @@ interface InviteMemberDialogProps {
   children?: React.ReactNode
 }
 
-export function InviteMemberDialog({ listId, children }: InviteMemberDialogProps) {
+export function InviteMemberDialog({
+  listId,
+  children,
+}: InviteMemberDialogProps) {
   const [open, setOpen] = useState(false)
   const { mutate: createInvitation, isPending } = useCreateInvitation()
 
@@ -59,7 +62,7 @@ export function InviteMemberDialog({ listId, children }: InviteMemberDialogProps
           setOpen(false)
           form.reset()
         },
-      }
+      },
     )
   }
 

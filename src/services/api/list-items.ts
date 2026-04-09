@@ -55,7 +55,7 @@ export const apiListItemsService = {
       `/lists/${listId}/items`,
       {
         method: "GET",
-      }
+      },
     )
     return response.items
   },
@@ -66,14 +66,14 @@ export const apiListItemsService = {
    */
   async addListItem(
     listId: string,
-    input: AddListItemInput
+    input: AddListItemInput,
   ): Promise<ListItem> {
     const response = await apiRequest<{ item: ListItem }>(
       `/lists/${listId}/items`,
       {
         method: "POST",
         body: JSON.stringify(input),
-      }
+      },
     )
     return response.item
   },

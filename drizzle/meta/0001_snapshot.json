@@ -59,12 +59,8 @@
           "name": "invitations_list_id_lists_id_fk",
           "tableFrom": "invitations",
           "tableTo": "lists",
-          "columnsFrom": [
-            "list_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["list_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -74,10 +70,7 @@
         "invitations_list_id_invitee_email_unique": {
           "name": "invitations_list_id_invitee_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "list_id",
-            "invitee_email"
-          ]
+          "columns": ["list_id", "invitee_email"]
         }
       },
       "policies": {},
@@ -158,12 +151,8 @@
           "name": "list_items_list_id_lists_id_fk",
           "tableFrom": "list_items",
           "tableTo": "lists",
-          "columnsFrom": [
-            "list_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["list_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -223,12 +212,8 @@
           "name": "list_members_list_id_lists_id_fk",
           "tableFrom": "list_members",
           "tableTo": "lists",
-          "columnsFrom": [
-            "list_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["list_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -238,10 +223,7 @@
         "list_members_list_id_user_id_unique": {
           "name": "list_members_list_id_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "list_id",
-            "user_id"
-          ]
+          "columns": ["list_id", "user_id"]
         }
       },
       "policies": {},

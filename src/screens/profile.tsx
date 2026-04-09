@@ -1,13 +1,16 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -15,16 +18,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email"),
-});
+})
 
 const passwordSchema = z
   .object({
@@ -34,7 +34,7 @@ const passwordSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
-  });
+  })
 
 export function ProfilePage() {
   const profileForm = useForm({
@@ -43,7 +43,7 @@ export function ProfilePage() {
       name: "Matheus Piegas",
       email: "matheus@example.com",
     },
-  });
+  })
 
   const passwordForm = useForm({
     resolver: zodResolver(passwordSchema),
@@ -51,7 +51,7 @@ export function ProfilePage() {
       password: "",
       confirmPassword: "",
     },
-  });
+  })
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -59,9 +59,7 @@ export function ProfilePage() {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>My Info</CardTitle>
-          <CardDescription>
-            Update your name and email address.
-          </CardDescription>
+          <CardDescription>Update your name and email address.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...profileForm}>
@@ -103,9 +101,7 @@ export function ProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle>Change Password</CardTitle>
-          <CardDescription>
-            Update your password here.
-          </CardDescription>
+          <CardDescription>Update your password here.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...passwordForm}>
@@ -145,5 +141,5 @@ export function ProfilePage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

@@ -12,7 +12,7 @@ export class ApiError extends Error {
 
 export async function apiRequest<T = unknown>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
   const method = (options.method ?? "GET").toUpperCase()
   const finalHeaders = new Headers(options.headers)

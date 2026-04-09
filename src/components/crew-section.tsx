@@ -1,11 +1,11 @@
-import { getImageUrl } from "@/services/tmdb"
-import type { CrewMember } from "@/services/tmdb"
 import {
   Card,
   CardContent,
   CardDescription,
   CardTitle,
 } from "@/components/ui/card"
+import type { CrewMember } from "@/services/tmdb"
+import { getImageUrl } from "@/services/tmdb"
 
 interface CrewCardProps {
   member: CrewMember

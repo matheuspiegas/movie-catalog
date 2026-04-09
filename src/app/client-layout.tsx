@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { NuqsAdapter } from "nuqs/adapters/next"
+import { useState } from "react"
 import { Toaster } from "sonner"
+import { LayoutContainer } from "@/components/layout-container"
 import { Navbar } from "@/components/navbar"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { AddToListProvider } from "@/contexts/add-to-list-context"
-import { LayoutContainer } from "@/components/layout-container"
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -19,7 +19,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             refetchOnWindowFocus: false,
           },
         },
-      })
+      }),
   )
 
   return (

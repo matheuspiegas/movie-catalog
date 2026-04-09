@@ -55,7 +55,7 @@ export function handleApiError(error: unknown) {
         message: "Validation error",
         details: error.flatten(),
       },
-      { status: 400 }
+      { status: 400 },
     )
   }
 
@@ -79,6 +79,6 @@ export function handleApiError(error: unknown) {
     {
       message: `Internal server error ${error}`,
     },
-    { status: 500 }
+    { status: 500 },
   )
 }

@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server"
 import { requireUserId } from "@/lib/auth"
+import { getUserSnapshotName } from "@/lib/clerk-users"
 import { handleApiError } from "@/lib/errors"
 import { createListSchema } from "@/lib/schemas/lists.schema"
 import { listsService } from "@/lib/services/lists"
-import { getUserSnapshotName } from "@/lib/clerk-users"
-
 
 export async function GET() {
   try {

@@ -6,7 +6,11 @@ interface CircularRatingProps {
   className?: string
 }
 
-export function CircularRating({ rating, size = "md", className }: CircularRatingProps) {
+export function CircularRating({
+  rating,
+  size = "md",
+  className,
+}: CircularRatingProps) {
   const percentage = (rating / 10) * 100
   const circumference = 2 * Math.PI * 40
   const strokeDashoffset = circumference - (percentage / 100) * circumference
@@ -32,6 +36,7 @@ export function CircularRating({ rating, size = "md", className }: CircularRatin
   return (
     <div className={cn("relative", sizes[size], className)}>
       <svg className="transform -rotate-90" viewBox="0 0 100 100">
+        <title>{`Nota ${rating.toFixed(1)} de 10`}</title>
         <circle
           cx="50"
           cy="50"
@@ -43,7 +48,10 @@ export function CircularRating({ rating, size = "md", className }: CircularRatin
           cx="50"
           cy="50"
           r="40"
-          className={cn("fill-none transition-all duration-500", getRatingColor(rating))}
+          className={cn(
+            "fill-none transition-all duration-500",
+            getRatingColor(rating),
+          )}
           strokeWidth="8"
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}

@@ -1,5 +1,17 @@
 "use client"
 
+import { useUser } from "@clerk/nextjs"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ArrowLeft, Edit, Plus, Trash2, Users } from "lucide-react"
+import Link from "next/link"
+import { useParams, useRouter } from "next/navigation"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { InviteMemberDialog } from "@/components/invite-member-dialog"
+import { ListMembersList } from "@/components/list-members-list"
+import { ListDetailPageSkeleton } from "@/components/skeletons/list-detail-page-skeleton"
+import { ListItemsSkeleton } from "@/components/skeletons/list-items-skeleton"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -8,8 +20,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { ListDetailPageSkeleton } from "@/components/skeletons/list-detail-page-skeleton"
-import { ListItemsSkeleton } from "@/components/skeletons/list-items-skeleton"
 import {
   Dialog,
   DialogContent,
@@ -21,18 +31,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useParams, useRouter } from "next/navigation"
 import { useApiListItems, useRemoveApiListItem } from "@/hooks/api/useListItems"
-import { useApiLists, useUpdateApiList, useDeleteApiList } from "@/hooks/api/useLists"
 import { useListMembers } from "@/hooks/api/useListMembers"
-import { ArrowLeft, Edit, Trash2, Plus, Users } from "lucide-react"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { InviteMemberDialog } from "@/components/invite-member-dialog"
-import { ListMembersList } from "@/components/list-members-list"
-import { useUser } from "@clerk/nextjs"
+import {
+  useApiList,
+  useDeleteApiList,
+  useUpdateApiList,
+} from "@/hooks/api/useLists"
 
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
@@ -65,18 +70,15 @@ export function ListPage() {
   >(null)
 
   // Queries
-  const { data: lists, isLoading: isLoadingLists } = useApiLists()
+  const { data: list, isLoading: isLoadingList } = useApiList(id!)
   const { data: items, isLoading: isLoadingItems } = useApiListItems(id!)
   const { data: members } = useListMembers(id!)
 
   // Mutations
   const { mutate: updateList, isPending: isUpdating } = useUpdateApiList()
   const { mutate: deleteList, isPending: isDeleting } = useDeleteApiList()
-  const { mutate: removeItem, isPending: isRemovingItem } = useRemoveApiListItem(
-    id!
-  )
-
-  const list = lists?.find((l) => l.id === id)
+  const { mutate: removeItem, isPending: isRemovingItem } =
+    useRemoveApiListItem(id!)
   const currentUserMember = members?.find((m) => m.userId === user?.id)
   const isOwner = currentUserMember?.role === "owner"
 
@@ -104,7 +106,7 @@ export function ListPage() {
           setIsEditDialogOpen(false)
           reset()
         },
-      }
+      },
     )
   }
 
@@ -118,6 +120,7 @@ export function ListPage() {
 
   const handleRemoveItem = (itemId: string | null) => {
     if (!itemId) return
+    setIsRemovingItemFromList(false)
     removeItem(itemId, {
       onSuccess: () => {
         setIsRemovingItemFromList(false)
@@ -126,7 +129,7 @@ export function ListPage() {
     })
   }
 
-  if (isLoadingLists) {
+  if (isLoadingList || isDeleting) {
     return <ListDetailPageSkeleton />
   }
 
@@ -210,6 +213,10 @@ export function ListPage() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
                 {items.map((item) => {
                   const canRemoveItem = isOwner || item.addedBy === user?.id
+                  const itemHref =
+                    item.mediaType === "movie"
+                      ? `/movie/${item.movieId}`
+                      : `/tv/${item.movieId}`
 
                   return (
                     <Card
@@ -217,16 +224,7 @@ export function ListPage() {
                       className="overflow-hidden hover:shadow-lg transition-shadow pt-0 h-full flex flex-col group relative"
                     >
                       <CardHeader className="p-0 relative">
-                        <div
-                          className="cursor-pointer"
-                          onClick={() =>
-                            router.push(
-                              item.mediaType === "movie"
-                                ? `/movie/${item.movieId}`
-                                : `/tv/${item.movieId}`
-                            )
-                          }
-                        >
+                        <Link href={itemHref} className="block">
                           {item.moviePosterPath ? (
                             <img
                               src={`${IMAGE_BASE_URL}${item.moviePosterPath}`}
@@ -240,7 +238,7 @@ export function ListPage() {
                               </span>
                             </div>
                           )}
-                        </div>
+                        </Link>
                         <Button
                           size="icon"
                           variant="destructive"
@@ -262,16 +260,7 @@ export function ListPage() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </CardHeader>
-                      <div
-                        className="contents cursor-pointer"
-                        onClick={() =>
-                          router.push(
-                            item.mediaType === "movie"
-                              ? `/movie/${item.movieId}`
-                              : `/tv/${item.movieId}`
-                          )
-                        }
-                      >
+                      <Link href={itemHref} className="contents">
                         <CardContent className="pt-4 grow flex flex-col">
                           <CardTitle className="line-clamp-2 text-base min-h-12">
                             {item.movieTitle}
@@ -280,13 +269,16 @@ export function ListPage() {
                             {item.movieReleaseDate && (
                               <>{item.movieReleaseDate.split("-")[0]} • </>
                             )}
-                            {item.movieVoteAverage && <>⭐ {item.movieVoteAverage}</>}
+                            {item.movieVoteAverage && (
+                              <>⭐ {item.movieVoteAverage}</>
+                            )}
                           </CardDescription>
                           <p className="mt-2 text-xs text-muted-foreground">
-                            Por {item.addedByName} • {formatAddedAt(item.addedAt)}
+                            Por {item.addedByName} •{" "}
+                            {formatAddedAt(item.addedAt)}
                           </p>
                         </CardContent>
-                      </div>
+                      </Link>
                     </Card>
                   )
                 })}
@@ -312,9 +304,7 @@ export function ListPage() {
               <p className="text-sm text-muted-foreground">
                 Gerencie quem tem acesso a esta lista
               </p>
-              {isOwner && (
-                <InviteMemberDialog listId={id!} />
-              )}
+              {isOwner && <InviteMemberDialog listId={id!} />}
             </div>
 
             <ListMembersList listId={id!} isOwner={isOwner} />

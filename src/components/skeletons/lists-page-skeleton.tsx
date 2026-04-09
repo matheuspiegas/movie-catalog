@@ -1,5 +1,5 @@
-import { Skeleton } from "@/components/ui/skeleton"
 import { ListCardSkeleton } from "@/components/skeletons/list-card-skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const listItems = Array.from({ length: 8 })
 

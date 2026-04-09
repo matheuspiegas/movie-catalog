@@ -1,13 +1,13 @@
 "use client"
 
-import { useInfiniteTrendingAll } from "@/hooks/useMovies"
-import { MovieCard } from "@/components/movie-card"
-import { MediaGrid } from "@/components/media-grid"
-import { HomePageSkeleton } from "@/components/skeletons/home-page-skeleton"
-import { useEffect, useRef, useState } from "react"
 import { ArrowUp } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useEffect, useRef, useState } from "react"
 import { GlobalSearchInput } from "@/components/global-search-input"
+import { MediaGrid } from "@/components/media-grid"
+import { MovieCard } from "@/components/movie-card"
+import { HomePageSkeleton } from "@/components/skeletons/home-page-skeleton"
+import { Button } from "@/components/ui/button"
+import { useInfiniteTrendingAll } from "@/hooks/useMovies"
 
 export function HomePage() {
   const observerTarget = useRef<HTMLDivElement>(null)
@@ -49,8 +49,8 @@ export function HomePage() {
 
   // Controlar visibilidade do botão de scroll to top
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    
+    if (typeof window === "undefined") return
+
     const handleScroll = () => {
       // Mostrar botão quando rolar mais de 400px
       setShowScrollTop(window.scrollY > 400)
@@ -61,7 +61,7 @@ export function HomePage() {
   }, [])
 
   const scrollToTop = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }

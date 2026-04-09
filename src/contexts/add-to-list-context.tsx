@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, type ReactNode, useContext, useState } from "react"
 import { AddToListDialog } from "@/components/add-to-list-dialog"
 import type { AddListItemInput } from "@/services/api/list-items"
 
@@ -8,7 +8,6 @@ interface AddToListContextType {
 
 const AddToListContext = createContext<AddToListContextType | null>(null)
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useAddToList() {
   const context = useContext(AddToListContext)
   if (!context) {

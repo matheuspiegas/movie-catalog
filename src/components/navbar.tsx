@@ -1,16 +1,11 @@
-'use client'
+"use client"
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs"
+import { ArrowLeft, Bell, Menu, X } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from "@clerk/nextjs"
-import { Button } from "@/components/ui/button"
-import { LayoutContainer } from "@/components/layout-container"
-import { ArrowLeft, Bell, Menu, X } from "lucide-react"
 import { useState } from "react"
+import { LayoutContainer } from "@/components/layout-container"
+import { Button } from "@/components/ui/button"
 import { usePendingInvitations } from "@/hooks/api/useInvitations"
 
 export function Navbar() {
@@ -21,7 +16,10 @@ export function Navbar() {
   const pendingCount = invitations?.length || 0
 
   // Verifica se pode voltar (não está na home e tem histórico)
-  const canGoBack = pathname !== "/" && typeof window !== 'undefined' && window.history.length > 1
+  const canGoBack =
+    pathname !== "/" &&
+    typeof window !== "undefined" &&
+    window.history.length > 1
 
   const handleGoBack = () => {
     router.back()
@@ -62,38 +60,38 @@ export function Navbar() {
           {/* Desktop Menu */}
           <ul className="hidden md:flex gap-6 items-center">
             <li>
-                <Link href="/" className="hover:underline">
-                  Início
-                </Link>
-              </li>
+              <Link href="/" className="hover:underline">
+                Início
+              </Link>
+            </li>
+            <li>
+              <Link href="/movies" className="hover:underline">
+                Filmes
+              </Link>
+            </li>
+            <li>
+              <Link href="/series" className="hover:underline">
+                Séries
+              </Link>
+            </li>
+            <li>
+              <Link href="/lists" className="hover:underline">
+                Minhas listas
+              </Link>
+            </li>
+            <SignedIn>
               <li>
-                <Link href="/movies" className="hover:underline">
-                  Filmes
+                <Link href="/invitations" className="hover:underline relative">
+                  <Bell className="h-5 w-5" />
+                  {pendingCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                      {pendingCount}
+                    </span>
+                  )}
                 </Link>
               </li>
-              <li>
-                <Link href="/series" className="hover:underline">
-                  Séries
-                </Link>
-              </li>
-              <li>
-                <Link href="/lists" className="hover:underline">
-                  Minhas listas
-                </Link>
-              </li>
-              <SignedIn>
-                <li>
-                  <Link href="/invitations" className="hover:underline relative">
-                    <Bell className="h-5 w-5" />
-                    {pendingCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                        {pendingCount}
-                      </span>
-                    )}
-                  </Link>
-                </li>
-              </SignedIn>
-            </ul>
+            </SignedIn>
+          </ul>
 
           {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-3">
@@ -115,6 +113,7 @@ export function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
+            type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-2 hover:bg-primary-foreground/10 rounded"
             aria-label="Toggle menu"
@@ -132,62 +131,62 @@ export function Navbar() {
       <div className={mobileMenuClassName}>
         <LayoutContainer className="py-4">
           <ul className="flex flex-col gap-4">
+            <li>
+              <Link
+                href="/"
+                className="block hover:underline"
+                onClick={closeMenu}
+              >
+                Início
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/movies"
+                className="block hover:underline"
+                onClick={closeMenu}
+              >
+                Filmes
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/series"
+                className="block hover:underline"
+                onClick={closeMenu}
+              >
+                Séries
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/lists"
+                className="block hover:underline"
+                onClick={closeMenu}
+              >
+                Minhas listas
+              </Link>
+            </li>
+            <SignedIn>
               <li>
                 <Link
-                  href="/"
-                  className="block hover:underline"
+                  href="/invitations"
+                  className="block hover:underline flex items-center gap-2"
                   onClick={closeMenu}
                 >
-                  Início
+                  <Bell className="h-5 w-5" />
+                  Convites
+                  {pendingCount > 0 && (
+                    <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {pendingCount}
+                    </span>
+                  )}
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/movies"
-                  className="block hover:underline"
-                  onClick={closeMenu}
-                >
-                  Filmes
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/series"
-                  className="block hover:underline"
-                  onClick={closeMenu}
-                >
-                  Séries
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/lists"
-                  className="block hover:underline"
-                  onClick={closeMenu}
-                >
-                  Minhas listas
-                </Link>
-              </li>
-              <SignedIn>
-                <li>
-                  <Link
-                    href="/invitations"
-                    className="block hover:underline flex items-center gap-2"
-                    onClick={closeMenu}
-                  >
-                    <Bell className="h-5 w-5" />
-                    Convites
-                    {pendingCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                        {pendingCount}
-                      </span>
-                    )}
-                  </Link>
-                </li>
-              </SignedIn>
-            </ul>
+            </SignedIn>
+          </ul>
 
-            {/* Mobile Auth */}
+          {/* Mobile Auth */}
           <div className="mt-4 pt-4 border-t border-primary-foreground/20">
             <SignedOut>
               <SignInButton mode="modal">

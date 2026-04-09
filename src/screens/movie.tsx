@@ -1,23 +1,23 @@
 "use client"
 
 import { useParams } from "next/navigation"
+import { CastCard } from "@/components/cast-card"
+import { CrewSection } from "@/components/crew-section"
+import { MediaBackdrop } from "@/components/media-backdrop"
+import { MediaInfoCard } from "@/components/media-info-card"
+import { MediaPageSkeleton } from "@/components/media-page-skeleton"
+import { MediaSidebar } from "@/components/media-sidebar"
+import { RecommendationsCarousel } from "@/components/recommendations-carousel"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { VideoEmbed } from "@/components/video-embed"
+import { useAddToList } from "@/contexts/add-to-list-context"
 import {
-  useMovieDetails,
   useMovieCredits,
+  useMovieDetails,
   useMovieRecommendations,
   useMovieVideos,
   useMovieWatchProviders,
 } from "@/hooks/useMovies"
-import { CastCard } from "@/components/cast-card"
-import { RecommendationsCarousel } from "@/components/recommendations-carousel"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MediaBackdrop } from "@/components/media-backdrop"
-import { MediaSidebar } from "@/components/media-sidebar"
-import { MediaInfoCard } from "@/components/media-info-card"
-import { MediaPageSkeleton } from "@/components/media-page-skeleton"
-import { VideoEmbed } from "@/components/video-embed"
-import { CrewSection } from "@/components/crew-section"
-import { useAddToList } from "@/contexts/add-to-list-context"
 
 export function MoviePage() {
   const { id } = useParams<{ id: string }>()
@@ -141,7 +141,6 @@ export function MoviePage() {
                   {movie.overview || "Sinopse não disponível."}
                 </p>
               </MediaInfoCard>
-
             </TabsContent>
 
             {/* Aba: Elenco e Equipe */}

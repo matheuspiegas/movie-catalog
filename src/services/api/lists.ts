@@ -36,6 +36,13 @@ interface GetListsResponse {
 }
 
 /**
+ * Resposta do backend ao buscar listas
+ */
+interface GetListResponse {
+  list: List
+}
+
+/**
  * Busca todas as listas do usuário autenticado
  */
 async function getLists(): Promise<List[]> {
@@ -43,6 +50,16 @@ async function getLists(): Promise<List[]> {
     method: "GET",
   })
   return response.lists
+}
+
+/**
+ * Busca uma lista específica
+ */
+async function getList(id: string): Promise<List> {
+  const response = await apiRequest<GetListResponse>(`/lists/${id}`, {
+    method: "GET",
+  })
+  return response.list
 }
 
 /**
@@ -59,10 +76,7 @@ async function createList(input: CreateListInput): Promise<List> {
 /**
  * Atualiza uma lista existente
  */
-async function updateList(
-  id: string,
-  input: UpdateListInput
-): Promise<List> {
+async function updateList(id: string, input: UpdateListInput): Promise<List> {
   const response = await apiRequest<{ list: List }>(`/lists/${id}`, {
     method: "PUT",
     body: JSON.stringify(input),
@@ -84,6 +98,7 @@ async function deleteList(id: string): Promise<void> {
  */
 export const apiListsService = {
   getLists,
+  getList,
   createList,
   updateList,
   deleteList,

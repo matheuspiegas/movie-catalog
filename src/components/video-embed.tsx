@@ -4,7 +4,11 @@ interface VideoEmbedProps {
   className?: string
 }
 
-export function VideoEmbed({ videoKey, title = "Video", className }: VideoEmbedProps) {
+export function VideoEmbed({
+  videoKey,
+  title = "Video",
+  className,
+}: VideoEmbedProps) {
   return (
     <div className={className}>
       <div className="relative w-full pb-[56.25%] rounded-xl overflow-hidden shadow-2xl ring-1 ring-border/50">

@@ -1,13 +1,13 @@
 "use client"
 
-import { useInfinitePopularMovies } from "@/hooks/useMovies"
-import { MovieCard } from "@/components/movie-card"
-import { MediaGrid } from "@/components/media-grid"
-import { MoviesPageSkeleton } from "@/components/skeletons/movies-page-skeleton"
-import { useEffect, useRef, useState } from "react"
-import { SearchMovieInput } from "@/components/search-movie-input"
 import { ArrowUp } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { MediaGrid } from "@/components/media-grid"
+import { MovieCard } from "@/components/movie-card"
+import { SearchMovieInput } from "@/components/search-movie-input"
+import { MoviesPageSkeleton } from "@/components/skeletons/movies-page-skeleton"
 import { Button } from "@/components/ui/button"
+import { useInfinitePopularMovies } from "@/hooks/useMovies"
 
 export function MoviesPage() {
   const observerTarget = useRef<HTMLDivElement>(null)
@@ -32,7 +32,7 @@ export function MoviesPage() {
           fetchNextPage()
         }
       },
-      { threshold: 0.1 } // Ativa quando 10% do elemento está visível
+      { threshold: 0.1 }, // Ativa quando 10% do elemento está visível
     )
 
     const currentTarget = observerTarget.current
@@ -49,8 +49,8 @@ export function MoviesPage() {
 
   // Controlar visibilidade do botão de scroll to top
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    
+    if (typeof window === "undefined") return
+
     const handleScroll = () => {
       // Mostrar botão quando rolar mais de 400px
       setShowScrollTop(window.scrollY > 400)
@@ -61,7 +61,7 @@ export function MoviesPage() {
   }, [])
 
   const scrollToTop = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
@@ -87,12 +87,15 @@ export function MoviesPage() {
   const movies = data?.pages.flatMap((page) => page.results) || []
 
   // Remove duplicatas baseado no ID do filme
-  const uniqueMovies = movies.reduce((acc, movie) => {
-    if (!acc.find((m) => m.id === movie.id)) {
-      acc.push(movie)
-    }
-    return acc
-  }, [] as typeof movies)
+  const uniqueMovies = movies.reduce(
+    (acc, movie) => {
+      if (!acc.find((m) => m.id === movie.id)) {
+        acc.push(movie)
+      }
+      return acc
+    },
+    [] as typeof movies,
+  )
 
   return (
     <div className="relative py-8">

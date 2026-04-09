@@ -27,11 +27,16 @@ async function getPendingInvitations(): Promise<Invitation[]> {
   return response.invitations
 }
 
-async function createInvitation(input: CreateInvitationInput): Promise<Invitation> {
-  const response = await apiRequest<{ invitation: Invitation }>("/invitations", {
-    method: "POST",
-    body: JSON.stringify(input),
-  })
+async function createInvitation(
+  input: CreateInvitationInput,
+): Promise<Invitation> {
+  const response = await apiRequest<{ invitation: Invitation }>(
+    "/invitations",
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  )
   return response.invitation
 }
 

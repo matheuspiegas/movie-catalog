@@ -1,6 +1,7 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -8,15 +9,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import Link from "next/link";
+} from "@/components/ui/card"
 
 export function MyListsPage() {
   const lists = Array.from({ length: 3 }).map((_, i) => ({
     id: i,
     name: `My List ${i + 1}`,
     itemCount: (i + 1) * 5,
-  }));
+  }))
 
   return (
     <div>
@@ -61,5 +61,5 @@ export function MyListsPage() {
         ))}
       </div>
     </div>
-  );
+  )
 }

@@ -1,7 +1,7 @@
 "use client"
 
-import { SearchMovieInput } from "@/components/search-movie-input"
 import { MovieCard } from "@/components/movie-card"
+import { SearchMovieInput } from "@/components/search-movie-input"
 
 export function SearchMoviePage() {
   const movies = Array.from({ length: 5 }).map((_, i) => ({

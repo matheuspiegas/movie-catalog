@@ -1,4 +1,11 @@
-import { integer, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core"
+import {
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core"
 
 export const lists = pgTable("lists", {
   id: uuid("id").defaultRandom().primaryKey(),

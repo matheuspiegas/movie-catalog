@@ -5,8 +5,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import { MovieCard } from "./movie-card"
 import type { Movie, TVShow } from "@/services/tmdb"
+import { MovieCard } from "./movie-card"
 
 interface RecommendationsCarouselProps {
   items: Movie[] | TVShow[]

@@ -1,4 +1,6 @@
+import { Heart } from "lucide-react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -6,10 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { getImageUrl } from "@/services/tmdb"
-import { Heart } from "lucide-react"
 import { useAddToList } from "@/contexts/add-to-list-context"
+import { getImageUrl } from "@/services/tmdb"
 
 interface MovieCardProps {
   id: number

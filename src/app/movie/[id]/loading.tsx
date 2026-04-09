@@ -1,10 +1,7 @@
-import { MediaPageSkeleton } from '@/components/media-page-skeleton'
-import React from 'react'
+import { MediaPageSkeleton } from "@/components/media-page-skeleton"
 
 const MovieLoadingPage = () => {
-  return (
-      <MediaPageSkeleton />
-  )
+  return <MediaPageSkeleton />
 }
 
 export default MovieLoadingPage

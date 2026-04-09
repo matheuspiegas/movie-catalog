@@ -1,26 +1,26 @@
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
+import { useQueryState } from "nuqs"
 import {
-  getPopularMovies,
-  getTrendingMovies,
-  searchMovies,
-  getMovieDetails,
   getMovieCredits,
+  getMovieDetails,
   getMovieRecommendations,
   getMovieVideos,
   getMovieWatchProviders,
   getPersonDetails,
   getPersonMovieCredits,
+  getPopularMovies,
   getPopularTVShows,
+  getTrendingAll,
+  getTrendingMovies,
   getTrendingTVShows,
-  searchTVShows,
-  getTVShowDetails,
   getTVShowCredits,
+  getTVShowDetails,
   getTVShowRecommendations,
   getTVShowVideos,
   getTVShowWatchProviders,
-  getTrendingAll,
+  searchMovies,
+  searchTVShows,
 } from "@/services/tmdb"
-import { useQueryState } from "nuqs"
 
 // ========== Hooks para conteúdo misto (trending all) ==========
 

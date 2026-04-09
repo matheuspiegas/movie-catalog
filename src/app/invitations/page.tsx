@@ -1,5 +1,5 @@
-import { PendingInvitationsList } from "@/components/pending-invitations-list"
 import { LayoutContainer } from "@/components/layout-container"
+import { PendingInvitationsList } from "@/components/pending-invitations-list"
 
 export default function InvitationsPage() {
   return (

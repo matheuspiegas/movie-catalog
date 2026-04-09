@@ -1,5 +1,8 @@
 "use client"
 
+import { useUser } from "@clerk/nextjs"
+import { Crown, Trash2, User } from "lucide-react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -10,9 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useListMembers, useRemoveMember } from "@/hooks/api/useListMembers"
-import { Crown, Trash2, User } from "lucide-react"
-import { useUser } from "@clerk/nextjs"
-import { useState } from "react"
 
 interface ListMembersListProps {
   listId: string
@@ -47,7 +47,10 @@ export function ListMembersList({ listId, isOwner }: ListMembersListProps) {
     return (
       <div className="space-y-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-12 rounded-lg border bg-card animate-pulse" />
+          <div
+            key={i}
+            className="h-12 rounded-lg border bg-card animate-pulse"
+          />
         ))}
       </div>
     )
@@ -66,7 +69,9 @@ export function ListMembersList({ listId, isOwner }: ListMembersListProps) {
   if (!members || members.length === 0) {
     return (
       <div className="rounded-lg border bg-muted/50 p-4 text-center">
-        <p className="text-sm text-muted-foreground">Nenhum membro nesta lista</p>
+        <p className="text-sm text-muted-foreground">
+          Nenhum membro nesta lista
+        </p>
       </div>
     )
   }
@@ -94,7 +99,9 @@ export function ListMembersList({ listId, isOwner }: ListMembersListProps) {
                 <p className="text-sm font-medium">
                   {member.userName}
                   {isCurrentUser && (
-                    <span className="ml-2 text-xs text-muted-foreground">(Você)</span>
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      (Você)
+                    </span>
                   )}
                 </p>
                 <p className="text-xs text-muted-foreground capitalize">
@@ -104,18 +111,18 @@ export function ListMembersList({ listId, isOwner }: ListMembersListProps) {
             </div>
 
             {canRemove && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
-                    setMemberToRemove({
-                      userId: member.userId,
-                      userName: member.userName,
-                    })
-                  }
-                  disabled={removeMemberMutation.isPending}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  setMemberToRemove({
+                    userId: member.userId,
+                    userName: member.userName,
+                  })
+                }
+                disabled={removeMemberMutation.isPending}
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
             )}
           </div>
@@ -134,7 +141,9 @@ export function ListMembersList({ listId, isOwner }: ListMembersListProps) {
             <DialogTitle>Remover membro</DialogTitle>
             <DialogDescription>
               Tem certeza que deseja remover
-              {memberToRemove ? ` "${memberToRemove.userName}"` : " este membro"}
+              {memberToRemove
+                ? ` "${memberToRemove.userName}"`
+                : " este membro"}
               ? Essa pessoa perdera o acesso a esta lista.
             </DialogDescription>
           </DialogHeader>

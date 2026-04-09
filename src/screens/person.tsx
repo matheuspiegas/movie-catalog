@@ -1,13 +1,13 @@
 "use client"
 
-import { useParams } from "next/navigation"
 import { Calendar, MapPin, Star } from "lucide-react"
-import { usePersonDetails, usePersonMovieCredits } from "@/hooks/useMovies"
-import { getImageUrl } from "@/services/tmdb"
-import { MovieCard } from "@/components/movie-card"
+import { useParams } from "next/navigation"
 import { MediaInfoCard } from "@/components/media-info-card"
+import { MovieCard } from "@/components/movie-card"
 import { MediaCardSkeleton } from "@/components/skeletons/media-card-skeleton"
 import { PersonPageSkeleton } from "@/components/skeletons/person-page-skeleton"
+import { usePersonDetails, usePersonMovieCredits } from "@/hooks/useMovies"
+import { getImageUrl } from "@/services/tmdb"
 
 export function PersonPage() {
   const { id } = useParams<{ id: string }>()
@@ -37,7 +37,7 @@ export function PersonPage() {
   const filmography = [...(credits?.cast ?? [])].sort(
     (a, b) =>
       new Date(b.release_date || 0).getTime() -
-      new Date(a.release_date || 0).getTime()
+      new Date(a.release_date || 0).getTime(),
   )
 
   const formatDate = (date: string) =>

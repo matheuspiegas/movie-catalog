@@ -1,6 +1,6 @@
-import type { Metadata } from "next"
-import { ClerkProvider } from "@clerk/nextjs"
 import { ptBR } from "@clerk/localizations"
+import { ClerkProvider } from "@clerk/nextjs"
+import type { Metadata } from "next"
 import { ClientLayout } from "./client-layout"
 import "./globals.css"
 

@@ -1,3 +1,8 @@
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Search, X } from "lucide-react"
+import { useQueryState } from "nuqs"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 import {
   Form,
   FormControl,
@@ -6,12 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { Button } from "./ui/button"
-import { useQueryState } from "nuqs"
-import { Search, X } from "lucide-react"
 
 const searchSchema = z.object({
   query: z.string().optional(),

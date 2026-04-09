@@ -1,3 +1,8 @@
+import { useQueryClient } from "@tanstack/react-query"
+import { Check, Plus } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -6,16 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { apiListItemsKeys } from "@/hooks/api/useListItems"
 import { useApiLists } from "@/hooks/api/useLists"
-import { Check, Plus } from "lucide-react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import type { AddListItemInput } from "@/services/api/list-items"
 import { apiListItemsService } from "@/services/api/list-items"
-import { useQueryClient } from "@tanstack/react-query"
-import { apiListItemsKeys } from "@/hooks/api/useListItems"
 
 interface AddToListDialogProps {
   open: boolean
@@ -94,6 +94,7 @@ export function AddToListDialog({
 
                 return (
                   <button
+                    type="button"
                     key={list.id}
                     onClick={() => handleAddToList(list.id)}
                     disabled={addingToListId !== null || successListId !== null}

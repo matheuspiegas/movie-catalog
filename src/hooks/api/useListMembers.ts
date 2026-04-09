@@ -22,12 +22,18 @@ export function useRemoveMember() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ listId, memberId }: { listId: string; memberId: string }) => {
+    mutationFn: async ({
+      listId,
+      memberId,
+    }: {
+      listId: string
+      memberId: string
+    }) => {
       return apiListMembersService.removeMember(listId, memberId)
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: apiListMembersKeys.byList(variables.listId) 
+      queryClient.invalidateQueries({
+        queryKey: apiListMembersKeys.byList(variables.listId),
       })
       toast.success("Membro removido com sucesso!")
     },

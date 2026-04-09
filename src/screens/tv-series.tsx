@@ -1,13 +1,13 @@
 "use client"
 
-import { useInfinitePopularTVShows } from "@/hooks/useMovies"
-import { MovieCard } from "@/components/movie-card"
-import { MediaGrid } from "@/components/media-grid"
-import { TVSeriesPageSkeleton } from "@/components/skeletons/tv-series-page-skeleton"
-import { useEffect, useRef, useState } from "react"
-import { SearchMovieInput } from "@/components/search-movie-input"
 import { ArrowUp } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { MediaGrid } from "@/components/media-grid"
+import { MovieCard } from "@/components/movie-card"
+import { SearchMovieInput } from "@/components/search-movie-input"
+import { TVSeriesPageSkeleton } from "@/components/skeletons/tv-series-page-skeleton"
 import { Button } from "@/components/ui/button"
+import { useInfinitePopularTVShows } from "@/hooks/useMovies"
 
 export function TVSeriesPage() {
   const observerTarget = useRef<HTMLDivElement>(null)
@@ -32,7 +32,7 @@ export function TVSeriesPage() {
           fetchNextPage()
         }
       },
-      { threshold: 0.1 } // Ativa quando 10% do elemento está visível
+      { threshold: 0.1 }, // Ativa quando 10% do elemento está visível
     )
 
     const currentTarget = observerTarget.current
@@ -49,8 +49,8 @@ export function TVSeriesPage() {
 
   // Controlar visibilidade do botão de scroll to top
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    
+    if (typeof window === "undefined") return
+
     const handleScroll = () => {
       // Mostrar botão quando rolar mais de 400px
       setShowScrollTop(window.scrollY > 400)
@@ -61,7 +61,7 @@ export function TVSeriesPage() {
   }, [])
 
   const scrollToTop = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
@@ -87,12 +87,15 @@ export function TVSeriesPage() {
   const tvShows = data?.pages.flatMap((page) => page.results) || []
 
   // Remove duplicatas baseado no ID da série
-  const uniqueTVShows = tvShows.reduce((acc, show) => {
-    if (!acc.find((s) => s.id === show.id)) {
-      acc.push(show)
-    }
-    return acc
-  }, [] as typeof tvShows)
+  const uniqueTVShows = tvShows.reduce(
+    (acc, show) => {
+      if (!acc.find((s) => s.id === show.id)) {
+        acc.push(show)
+      }
+      return acc
+    },
+    [] as typeof tvShows,
+  )
 
   return (
     <div className="relative py-8">

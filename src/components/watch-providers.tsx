@@ -1,6 +1,6 @@
-import { getImageUrl } from "@/services/tmdb"
-import type { WatchProvider } from "@/services/tmdb"
 import { cn } from "@/lib/utils"
+import type { WatchProvider } from "@/services/tmdb"
+import { getImageUrl } from "@/services/tmdb"
 
 interface WatchProvidersProps {
   providers: WatchProvider[]
@@ -14,7 +14,11 @@ const providerTypeLabels = {
   buy: "Comprar",
 }
 
-export function WatchProviders({ providers, type, className }: WatchProvidersProps) {
+export function WatchProviders({
+  providers,
+  type,
+  className,
+}: WatchProvidersProps) {
   if (!providers || providers.length === 0) return null
 
   return (

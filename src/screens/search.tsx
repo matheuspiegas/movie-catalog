@@ -1,13 +1,13 @@
 "use client"
 
-import { useQueryState } from "nuqs"
-import { useSearchTVShows, useSearchMovies } from "@/hooks/useMovies"
-import { MovieCard } from "@/components/movie-card"
-import { GlobalSearchInput } from "@/components/global-search-input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
 import { ArrowUp } from "lucide-react"
+import { useQueryState } from "nuqs"
+import { useEffect, useState } from "react"
+import { GlobalSearchInput } from "@/components/global-search-input"
+import { MovieCard } from "@/components/movie-card"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useSearchMovies, useSearchTVShows } from "@/hooks/useMovies"
 
 export function SearchPage() {
   const [query] = useQueryState("query")
@@ -15,8 +15,8 @@ export function SearchPage() {
 
   // Controlar visibilidade do botão de scroll to top
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    
+    if (typeof window === "undefined") return
+
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400)
     }
@@ -26,7 +26,7 @@ export function SearchPage() {
   }, [])
 
   const scrollToTop = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }

@@ -1,7 +1,10 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useAcceptInvitation, useRejectInvitation } from "@/hooks/api/useInvitations"
+import {
+  useAcceptInvitation,
+  useRejectInvitation,
+} from "@/hooks/api/useInvitations"
 import type { Invitation } from "@/services/api/invitations"
 
 interface InvitationCardProps {

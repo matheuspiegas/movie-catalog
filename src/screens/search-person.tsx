@@ -1,5 +1,9 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
+import Link from "next/link"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -8,10 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
 import {
   Form,
   FormControl,
@@ -19,7 +19,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form"
-import Link from "next/link"
+import { Input } from "@/components/ui/input"
 
 const searchSchema = z.object({
   query: z.string().min(1, "Required"),

@@ -17,11 +17,11 @@ export function MediaPageSkeleton() {
           <Skeleton className="h-24 w-full rounded-lg" />
           <Skeleton className="h-32 w-full rounded-lg" />
         </div>
-        
+
         <div className="lg:w-2/3 space-y-6">
           {/* Tabs Skeleton */}
           <Skeleton className="h-10 w-full rounded-lg" />
-          
+
           {/* Content */}
           <div className="space-y-4">
             <Skeleton className="h-64 w-full rounded-lg" />

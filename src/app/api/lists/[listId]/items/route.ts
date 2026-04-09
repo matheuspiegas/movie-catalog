@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic"
 
 export async function GET(
   _request: Request,
-  { params }: { params: { listId: string } }
+  { params }: { params: { listId: string } },
 ) {
   try {
     const userId = await requireUserId()
@@ -27,7 +27,7 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { listId: string } }
+  { params }: { params: { listId: string } },
 ) {
   try {
     const userId = await requireUserId()

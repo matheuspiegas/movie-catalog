@@ -14,16 +14,22 @@ interface GetMembersResponse {
 }
 
 async function getListMembers(listId: string): Promise<ListMember[]> {
-  const response = await apiRequest<GetMembersResponse>(`/lists/${listId}/members`, {
-    method: "GET",
-  })
+  const response = await apiRequest<GetMembersResponse>(
+    `/lists/${listId}/members`,
+    {
+      method: "GET",
+    },
+  )
   return response.members
 }
 
 async function removeMember(listId: string, memberId: string): Promise<void> {
-  await apiRequest<{ message: string }>(`/lists/${listId}/members/${memberId}`, {
-    method: "DELETE",
-  })
+  await apiRequest<{ message: string }>(
+    `/lists/${listId}/members/${memberId}`,
+    {
+      method: "DELETE",
+    },
+  )
 }
 
 export const apiListMembersService = {

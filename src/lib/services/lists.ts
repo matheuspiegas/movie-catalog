@@ -1,11 +1,11 @@
 import "server-only"
-import type { z } from "zod"
-import { eq, inArray } from "drizzle-orm"
 import type { InferSelectModel } from "drizzle-orm"
+import { eq, inArray } from "drizzle-orm"
+import type { z } from "zod"
+import { listMembers, lists } from "@/db/schema"
 import { db } from "@/lib/db"
-import { lists, listMembers } from "@/db/schema"
 import { ForbiddenError, NotFoundError } from "@/lib/errors"
-import {
+import type {
   createListSchema,
   updateListSchema,
 } from "@/lib/schemas/lists.schema"
@@ -34,7 +34,11 @@ const toListDto = (list: ListRow): ListDto => ({
 })
 
 const getListById = async (listId: string) => {
-  const rows = await db.select().from(lists).where(eq(lists.id, listId)).limit(1)
+  const rows = await db
+    .select()
+    .from(lists)
+    .where(eq(lists.id, listId))
+    .limit(1)
   return rows[0] ?? null
 }
 
@@ -42,13 +46,28 @@ export const listsService = {
   async getAllByUser(userId: string): Promise<ListDto[]> {
     // Get all list IDs where user is a member
     const listIds = await listMembersService.getUserListIds(userId)
-    
+
     if (listIds.length === 0) {
       return []
     }
 
     const rows = await db.select().from(lists).where(inArray(lists.id, listIds))
     return rows.map(toListDto)
+  },
+
+  async getList(listId: string, userId: string): Promise<ListDto> {
+    const existing = await getListById(listId)
+
+    if (!existing) {
+      throw new NotFoundError("Lista nao encontrada")
+    }
+
+    const permission = await listMembersService.checkPermission(listId, userId)
+    if (!permission.isMember) {
+      throw new ForbiddenError("Voce nao tem acesso a esta lista")
+    }
+
+    return toListDto(existing)
   },
 
   async create(userId: string, data: CreateListInput): Promise<ListDto> {
@@ -75,7 +94,7 @@ export const listsService = {
   async update(
     listId: string,
     userId: string,
-    data: UpdateListInput
+    data: UpdateListInput,
   ): Promise<ListDto> {
     const existing = await getListById(listId)
 

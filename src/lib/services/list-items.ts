@@ -1,15 +1,11 @@
 import "server-only"
-import type { z } from "zod"
-import { and, eq } from "drizzle-orm"
 import type { InferSelectModel } from "drizzle-orm"
-import { db } from "@/lib/db"
+import { and, eq } from "drizzle-orm"
+import type { z } from "zod"
 import { listItems, listMembers, lists } from "@/db/schema"
-import {
-  ConflictError,
-  ForbiddenError,
-  NotFoundError,
-} from "@/lib/errors"
-import { createListItemSchema } from "@/lib/schemas/list-items.schema"
+import { db } from "@/lib/db"
+import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/errors"
+import type { createListItemSchema } from "@/lib/schemas/list-items.schema"
 import { listMembersService } from "./list-members"
 
 type CreateListItemInput = z.infer<typeof createListItemSchema>
@@ -29,7 +25,10 @@ export type ListItemDto = {
   addedByName: string
 }
 
-const toListItemDto = (item: ListItemRow, addedByName?: string): ListItemDto => ({
+const toListItemDto = (
+  item: ListItemRow,
+  addedByName?: string,
+): ListItemDto => ({
   id: item.id,
   listId: item.listId,
   movieId: item.movieId,
@@ -44,7 +43,11 @@ const toListItemDto = (item: ListItemRow, addedByName?: string): ListItemDto => 
 })
 
 const assertListAccess = async (listId: string, userId: string) => {
-  const rows = await db.select().from(lists).where(eq(lists.id, listId)).limit(1)
+  const rows = await db
+    .select()
+    .from(lists)
+    .where(eq(lists.id, listId))
+    .limit(1)
   const list = rows[0]
 
   if (!list) {
@@ -78,13 +81,15 @@ export const listItemsService = {
       )
       .where(eq(listItems.listId, listId))
 
-    return rows.map((row) => toListItemDto(row.item, row.addedByName ?? undefined))
+    return rows.map((row) =>
+      toListItemDto(row.item, row.addedByName ?? undefined),
+    )
   },
 
   async create(
     listId: string,
     userId: string,
-    data: CreateListItemInput
+    data: CreateListItemInput,
   ): Promise<ListItemDto> {
     // Members can add items
     await assertListAccess(listId, userId)
@@ -96,8 +101,8 @@ export const listItemsService = {
         and(
           eq(listItems.listId, listId),
           eq(listItems.movieId, data.movieId),
-          eq(listItems.mediaType, data.mediaType)
-        )
+          eq(listItems.mediaType, data.mediaType),
+        ),
       )
       .limit(1)
 
@@ -145,7 +150,9 @@ export const listItemsService = {
 
     // Owners can delete any item, members can only delete their own
     if (!permission.isOwner && existingItem[0].addedBy !== userId) {
-      throw new ForbiddenError("Voce so pode remover itens adicionados por voce")
+      throw new ForbiddenError(
+        "Voce so pode remover itens adicionados por voce",
+      )
     }
 
     await db.delete(listItems).where(eq(listItems.id, itemId))

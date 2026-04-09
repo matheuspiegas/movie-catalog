@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Calendar, Clock, DollarSign, Heart, Tv } from "lucide-react"
 import { CircularRating } from "@/components/circular-rating"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { WatchProviders } from "@/components/watch-providers"
-import { Heart, Calendar, Clock, DollarSign, Tv } from "lucide-react"
 import type {
+  CountryWatchProviders,
   MovieDetails,
   TVShowDetails,
-  CountryWatchProviders,
 } from "@/services/tmdb"
 
 interface MediaSidebarProps {

@@ -241,15 +241,15 @@ export interface WatchProvidersResponse {
 // Buscar filmes populares ou fazer busca
 export async function getPopularMovies(
   page: number = 1,
-  search?: string | null
+  search?: string | null,
 ): Promise<MoviesResponse> {
   // Se há um termo de busca, usa o endpoint de search
   if (search && search.trim().length > 0) {
     const response = await fetch(
       `${BASE_URL}/search/movie?language=pt-BR&query=${encodeURIComponent(
-        search
+        search,
       )}&page=${page}`,
-      { headers }
+      { headers },
     )
 
     if (!response.ok) {
@@ -262,7 +262,7 @@ export async function getPopularMovies(
   // Caso contrário, retorna filmes populares
   const response = await fetch(
     `${BASE_URL}/movie/popular?language=pt-BR&page=${page}`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -274,11 +274,11 @@ export async function getPopularMovies(
 
 // Buscar filmes em alta (trending)
 export async function getTrendingMovies(
-  timeWindow: "day" | "week" = "day"
+  timeWindow: "day" | "week" = "day",
 ): Promise<MoviesResponse> {
   const response = await fetch(
     `${BASE_URL}/trending/movie/${timeWindow}?language=pt-BR`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -291,13 +291,13 @@ export async function getTrendingMovies(
 // Buscar filmes por termo de busca
 export async function searchMovies(
   query: string,
-  page: number = 1
+  page: number = 1,
 ): Promise<MoviesResponse> {
   const response = await fetch(
     `${BASE_URL}/search/movie?language=pt-BR&query=${encodeURIComponent(
-      query
+      query,
     )}&page=${page}`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -310,7 +310,7 @@ export async function searchMovies(
 // Gerar URL de imagem
 export function getImageUrl(
   path: string | null,
-  size: "w500" | "original" = "w500"
+  size: "w500" | "original" = "w500",
 ): string {
   if (!path) return "/placeholder-movie.png"
   return `${IMAGE_BASE_URL}/${size}${path}`
@@ -321,11 +321,11 @@ export function getImageUrl(
 // Buscar conteúdo em alta (trending) - filmes e séries misturados
 export async function getTrendingAll(
   timeWindow: "day" | "week" = "day",
-  page: number = 1
+  page: number = 1,
 ): Promise<MediaResponse> {
   const response = await fetch(
     `${BASE_URL}/trending/all/${timeWindow}?language=pt-BR&page=${page}`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -352,11 +352,11 @@ export async function getMovieDetails(movieId: number): Promise<MovieDetails> {
 
 // Buscar elenco de um filme
 export async function getMovieCredits(
-  movieId: number
+  movieId: number,
 ): Promise<CreditsResponse> {
   const response = await fetch(
     `${BASE_URL}/movie/${movieId}/credits?language=pt-BR`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -368,11 +368,11 @@ export async function getMovieCredits(
 
 // Buscar recomendações de filmes
 export async function getMovieRecommendations(
-  movieId: number
+  movieId: number,
 ): Promise<MoviesResponse> {
   const response = await fetch(
     `${BASE_URL}/movie/${movieId}/recommendations?language=pt-BR`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -386,7 +386,7 @@ export async function getMovieRecommendations(
 export async function getMovieVideos(movieId: number): Promise<VideosResponse> {
   const response = await fetch(
     `${BASE_URL}/movie/${movieId}/videos?language=pt-BR`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -398,12 +398,11 @@ export async function getMovieVideos(movieId: number): Promise<VideosResponse> {
 
 // Buscar plataformas de streaming onde o filme está disponível
 export async function getMovieWatchProviders(
-  movieId: number
+  movieId: number,
 ): Promise<WatchProvidersResponse> {
-  const response = await fetch(
-    `${BASE_URL}/movie/${movieId}/watch/providers`,
-    { headers }
-  )
+  const response = await fetch(`${BASE_URL}/movie/${movieId}/watch/providers`, {
+    headers,
+  })
 
   if (!response.ok) {
     throw new Error("Erro ao buscar plataformas de streaming")
@@ -414,11 +413,11 @@ export async function getMovieWatchProviders(
 
 // Buscar detalhes de uma pessoa
 export async function getPersonDetails(
-  personId: number
+  personId: number,
 ): Promise<PersonDetails> {
   const response = await fetch(
     `${BASE_URL}/person/${personId}?language=pt-BR`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -430,11 +429,11 @@ export async function getPersonDetails(
 
 // Buscar filmografia de uma pessoa
 export async function getPersonMovieCredits(
-  personId: number
+  personId: number,
 ): Promise<PersonCreditsResponse> {
   const response = await fetch(
     `${BASE_URL}/person/${personId}/movie_credits?language=pt-BR`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -449,15 +448,15 @@ export async function getPersonMovieCredits(
 // Buscar séries populares ou fazer busca
 export async function getPopularTVShows(
   page: number = 1,
-  search?: string | null
+  search?: string | null,
 ): Promise<TVShowsResponse> {
   // Se há um termo de busca, usa o endpoint de search
   if (search && search.trim().length > 0) {
     const response = await fetch(
       `${BASE_URL}/search/tv?language=pt-BR&query=${encodeURIComponent(
-        search
+        search,
       )}&page=${page}`,
-      { headers }
+      { headers },
     )
 
     if (!response.ok) {
@@ -470,7 +469,7 @@ export async function getPopularTVShows(
   // Caso contrário, retorna séries populares
   const response = await fetch(
     `${BASE_URL}/tv/popular?language=pt-BR&page=${page}`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -482,11 +481,11 @@ export async function getPopularTVShows(
 
 // Buscar séries em alta (trending)
 export async function getTrendingTVShows(
-  timeWindow: "day" | "week" = "day"
+  timeWindow: "day" | "week" = "day",
 ): Promise<TVShowsResponse> {
   const response = await fetch(
     `${BASE_URL}/trending/tv/${timeWindow}?language=pt-BR`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -499,13 +498,13 @@ export async function getTrendingTVShows(
 // Buscar séries por termo de busca
 export async function searchTVShows(
   query: string,
-  page: number = 1
+  page: number = 1,
 ): Promise<TVShowsResponse> {
   const response = await fetch(
     `${BASE_URL}/search/tv?language=pt-BR&query=${encodeURIComponent(
-      query
+      query,
     )}&page=${page}`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -532,7 +531,7 @@ export async function getTVShowDetails(tvId: number): Promise<TVShowDetails> {
 export async function getTVShowCredits(tvId: number): Promise<CreditsResponse> {
   const response = await fetch(
     `${BASE_URL}/tv/${tvId}/credits?language=pt-BR`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -544,11 +543,11 @@ export async function getTVShowCredits(tvId: number): Promise<CreditsResponse> {
 
 // Buscar recomendações de séries
 export async function getTVShowRecommendations(
-  tvId: number
+  tvId: number,
 ): Promise<TVShowsResponse> {
   const response = await fetch(
     `${BASE_URL}/tv/${tvId}/recommendations?language=pt-BR`,
-    { headers }
+    { headers },
   )
 
   if (!response.ok) {
@@ -560,10 +559,9 @@ export async function getTVShowRecommendations(
 
 // Buscar vídeos/trailers de uma série
 export async function getTVShowVideos(tvId: number): Promise<VideosResponse> {
-  const response = await fetch(
-    `${BASE_URL}/tv/${tvId}/videos?language=pt-BR`,
-    { headers }
-  )
+  const response = await fetch(`${BASE_URL}/tv/${tvId}/videos?language=pt-BR`, {
+    headers,
+  })
 
   if (!response.ok) {
     throw new Error("Erro ao buscar vídeos da série")
@@ -574,12 +572,11 @@ export async function getTVShowVideos(tvId: number): Promise<VideosResponse> {
 
 // Buscar plataformas de streaming onde a série está disponível
 export async function getTVShowWatchProviders(
-  tvId: number
+  tvId: number,
 ): Promise<WatchProvidersResponse> {
-  const response = await fetch(
-    `${BASE_URL}/tv/${tvId}/watch/providers`,
-    { headers }
-  )
+  const response = await fetch(`${BASE_URL}/tv/${tvId}/watch/providers`, {
+    headers,
+  })
 
   if (!response.ok) {
     throw new Error("Erro ao buscar plataformas de streaming")

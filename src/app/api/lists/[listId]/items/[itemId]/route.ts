@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic"
 
 export async function DELETE(
   _request: Request,
-  { params }: { params: { listId: string; itemId: string } }
+  { params }: { params: { listId: string; itemId: string } },
 ) {
   try {
     const userId = await requireUserId()
